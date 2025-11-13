@@ -1,7 +1,7 @@
 
 A group IT project focused on building a web application, which forms the foundation of my bachelor’s thesis.
 
-# 🩺 Comijest.pl
+# 🩺 Comijest
 
 Aplikacja webowa pomagająca użytkownikowi wstępnie zdiagnozować możliwe choroby na podstawie wprowadzonych objawów.
 
