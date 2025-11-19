@@ -1,18 +1,19 @@
 from flask import Flask
-from pymongo import PyMongo
+from flask_pymongo import PyMongo
+from app.config import MONGO_URI
 
 mongo = PyMongo()
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('app.config')
-    
+    app.config["MONGO_URI"] = MONGO_URI
+
+
     mongo.init_app(app)
 
-    # Blueprints (routes from express) here
-
+    try:
+        print("Connection sucess Using DB:", mongo.db.name)
+    except Exception as e:
+        print("Connection failed:", e)
+    #blueprints (routes) here
     return app
-
-
-def get_db():
-    return mongo.db
