@@ -24,11 +24,12 @@ services:
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - frontend
-    restart: unless-stopped
     networks:
       - comijest_net
+    restart: unless-stopped
     
 
 networks:
