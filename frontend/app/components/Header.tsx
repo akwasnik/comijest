@@ -1,13 +1,39 @@
+import Image from "next/image";
+import { User } from "lucide-react";
+
 export default function Header() {
   return (
-    <header className="w-full bg-white shadow-md py-4 px-6 flex justify-between items-center">
-      <h1 className="text-xl font-bold">Comijest</h1>
+    <header className="w-full bg-white shadow-sm shadow-red-300 py-5 px-6">
+      <div className="mx-auto flex justify-between items-center">
+        
+        <a href="/" className="flex flex-col items-start">
+          <Image 
+            src="/logo.png"
+            alt="Comijest logo"
+            width={60}
+            height={60}
+            className="mb-1"
+          />
 
-      <nav className="flex gap-4">
-        <a href="/" className="hover:text-blue-600">Strona główna</a>
-        <a href="/symptoms" className="hover:text-blue-600">Objawy</a>
-        <a href="/about" className="hover:text-blue-600">O nas</a>
-      </nav>
+          <Image 
+            src="/logoText.png"
+            alt="Comijest"
+            width={60}
+            height={60}
+            className="absolute top-11 left-5.5"
+          />
+        </a>
+
+        <div className="flex items-center gap-6">
+          <a href="/about" className="text-sm font-medium text-red-400 hover:text-red-700">
+            O nas
+          </a>
+
+          <a href="/account" className="text-red-400 hover:text-red-700">
+            <User size={26} />
+          </a>
+        </div>
+      </div>
     </header>
   );
 }

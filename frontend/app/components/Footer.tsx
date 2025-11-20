@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="w-full bg-gray-50 border-t mt-10 text-sm text-gray-800">
+    <footer className="w-full bg-white shadow-red-300 shadow-[0_-1px_4px] text-sm text-gray-800">
       <div className="bg-yellow-50 border-b border-yellow-200 m-4 px-6 py-4 rounded-3xl">
         <div className="max-w-5xl mx-auto flex items-start gap-3">
           <span className="text-lg leading-none mt-0.5">ℹ️</span>
@@ -46,13 +46,13 @@ export default function Footer() {
               Technologia oceny objawów i triżu zasilana przez
             </p>
             <p className="mb-2 font-semibold text-red-500">
-              AREK LOREK
+              AI
             </p>
             <p className="mb-4">
               Aby uzyskać więcej informacji, sprawdź nasze:
             </p>
             <ul className="space-y-1">
-              <li>
+              {/* <li>
                 <a href="/cookies" className="text-blue-600 hover:underline">
                   Polityka Cookies
                 </a>
@@ -61,7 +61,7 @@ export default function Footer() {
                 <a href="/privacy" className="text-blue-600 hover:underline">
                   Polityka prywatności
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a href="/terms" className="text-blue-600 hover:underline">
                   Warunki korzystania z usług
