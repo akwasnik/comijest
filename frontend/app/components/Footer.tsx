@@ -43,7 +43,7 @@ export default function Footer() {
           <div className="text-sm">
             <h3 className="font-semibold mb-3 text-base">Dowiedz się więcej</h3>
             <p className="mb-2">
-              Technologia oceny objawów i triżu zasilana przez
+              Technologia oceny objawów i triażu zasilana przez
             </p>
             <p className="mb-2 font-semibold text-red-500">
               AI
