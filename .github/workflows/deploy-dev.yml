@@ -1,0 +1,33 @@
+name: Deploy dev to VPS
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Connect to VPS and deploy
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd /home/debian/comijest
+
+          echo ">>> Pull latest changes"
+          git pull origin dev
+
+          echo ">>> Restarting Docker Compose"
+          docker compose pull
+          docker compose build --no-cache
+          docker compose down
+          docker compose up -d
+
+          echo ">>> DONE"
