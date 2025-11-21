@@ -6,7 +6,7 @@ import Footer from "./components/Footer";
 
 // LENIS SMOOTH SCROLL
 
-import { ReactLenis } from './utils/lenis';
+import SmoothScrollProvider from "./providers/SmoothScrollProvider";
 
 
 export const metadata: Metadata = {
@@ -20,17 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
-      <ReactLenis root>
+      
         <body className="min-h-screen flex flex-col">
-          <Header />
           
-          <main className="grow container mx-auto px-4 py-6">
-            {children}
-          </main>
-
-          <Footer />
+            <Header />
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            <Footer />
         </body>
-      </ReactLenis>
     </html>
   );
 }
