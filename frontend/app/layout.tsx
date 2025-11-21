@@ -3,6 +3,12 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+
+// LENIS SMOOTH SCROLL
+
+import SmoothScrollProvider from "./providers/SmoothScrollProvider";
+
+
 export const metadata: Metadata = {
   title: "Comijest",
 };
@@ -14,15 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
-      <body className="min-h-screen flex flex-col">
-        <Header />
-        
-        <main className="grow container mx-auto px-4 py-6">
-          {children}
-        </main>
-
-        <Footer />
-      </body>
+      
+        <body className="min-h-screen flex flex-col">
+            <Header />
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            <Footer />
+        </body>
     </html>
   );
 }
