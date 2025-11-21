@@ -22,7 +22,6 @@ export default function RootLayout({
     <html lang="pl">
       
         <body className="min-h-screen flex flex-col">
-          
             <Header />
             <SmoothScrollProvider>{children}</SmoothScrollProvider>
             <Footer />
