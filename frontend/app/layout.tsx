@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 // LENIS SMOOTH SCROLL
 
 import SmoothScrollProvider from "./providers/SmoothScrollProvider";
+import ThemeContextProvider from "./context/theme-context";
 
 
 export const metadata: Metadata = {
@@ -22,9 +23,11 @@ export default function RootLayout({
     <html lang="pl">
       
         <body className="min-h-screen flex flex-col">
+          <ThemeContextProvider>
             <Header />
             <SmoothScrollProvider>{children}</SmoothScrollProvider>
             <Footer />
+          </ThemeContextProvider>
         </body>
     </html>
   );

@@ -1,10 +1,10 @@
 export default function Footer() {
   return (
-    <footer className="w-full bg-white shadow-red-300 shadow-[0_-1px_4px] text-sm text-gray-800">
+    <footer className="w-full bg-transparent shadow-red-300 shadow-[0_-1px_4px] text-sm text-gray-800 dark:text-neutral-300">
       <div className="bg-yellow-50 border-b border-yellow-200 m-4 px-6 py-4 rounded-3xl">
         <div className="max-w-5xl mx-auto flex items-start gap-3">
           <span className="text-lg leading-none mt-0.5">ℹ️</span>
-          <p className="text-xs md:text-sm leading-relaxed">
+          <p className="text-xs md:text-sm leading-relaxed dark:text-gray-800">
             <strong>Comijest.com.pl</strong> nie stawia diagnozy medycznej i nie powinien
             zastępować oceny licencjonowanego lekarza. Dostarcza informacji pomocnych
             w podejmowaniu decyzji w oparciu o łatwo dostępne informacje o objawach. Jeśli
