@@ -38,3 +38,64 @@ html.lenis body{
 .lenis.lenis-smooth iframe{
   pointer-events: none;
 }
+
+/* CTA ANIMATION */
+
+.heartbeat-wrapper {
+  position: relative;
+  width: 225px;
+  height: 225px;
+}
+
+.heartbeat-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgba(248, 113, 113, 0.5);
+  background: radial-gradient(
+    circle,
+    rgba(248, 113, 113, 0.35),
+    rgba(248, 113, 113, 0.0)
+  );
+  opacity: 0;
+}
+
+@keyframes heartbeatPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.0;
+  }
+  15% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  40% {
+    transform: scale(1.25);
+    opacity: 0.3;
+  }
+  70% {
+    transform: scale(1.35);
+    opacity: 0.0;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0.0;
+  }
+}
+
+.heartbeat-ring-1 {
+  animation: heartbeatPulse 2.4s ease-out infinite;
+}
+
+.heartbeat-ring-2 {
+  animation: heartbeatPulse 2.4s ease-out infinite;
+  animation-delay: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heartbeat-ring {
+    animation: none;
+    opacity: 0.08;
+    transform: scale(1.05);
+  }
+}
