@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef } from "react"
 import { Moon, Sun } from "lucide-react"
 import { flushSync } from "react-dom"
 
-import { cn } from "@/app/lib/utils"
-import { useThemeContext } from "@/app/context/theme-context"
+import { cn } from "../../lib/utils"
+import { useThemeContext } from "../../context/theme-context"
 
 
 interface AnimatedThemeTogglerProps
