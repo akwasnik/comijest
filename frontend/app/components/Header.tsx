@@ -24,13 +24,13 @@ export default function Header() {
           />
         </a>
 
-        <div className="flex items-center gap-6">
-          <a href="/about" className="text-sm font-medium text-red-400 hover:text-red-700">
+        <div className="flex items-center gap-6 pr-2">
+          <a href="/about" className="text-md font-bold text-red-400 hover:text-red-700">
             O nas
           </a>
 
           <a href="/account" className="text-red-400 hover:text-red-700">
-            <User size={26} />
+            <User size={30} />
           </a>
         </div>
       </div>
