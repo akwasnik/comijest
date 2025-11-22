@@ -9,7 +9,7 @@ export default function CallToAction() {
   return (
     <section className="relative overflow-hidden py-16 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="relative bg-red-50/70 border border-red-100 rounded-3xl px-6 py-12 md:px-12 md:py-16 flex flex-col items-center justify-center text-center shadow-[0_18px_40px_rgba(220,38,38,0.18)]">
+        <div className="relative bg-red-50/70 dark:bg-red-400/10 border border-red-100 dark:border-none rounded-3xl px-6 py-12 md:px-12 md:py-16 flex flex-col items-center justify-center text-center shadow-[0_18px_40px_rgba(220,38,38,0.18)]">
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="heartbeat-wrapper">
               <div className="heartbeat-ring heartbeat-ring-1" />
@@ -30,7 +30,7 @@ export default function CallToAction() {
             initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
             animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5 }}
-            className="relative text-sm md:text-base text-red-900/80 max-w-xl mx-auto mb-8"
+            className="relative text-sm md:text-base text-red-900/80 dark:text-white max-w-xl mx-auto mb-8"
           >
             Zaznacz twoje objawy, a model AI zwróci Ci możliwą diagnozę.
           </motion.p>
