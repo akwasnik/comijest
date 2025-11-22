@@ -1,5 +1,9 @@
+import CallToAction from "./components/CallToAction";
+
 export default function Home() {
   return (
-    <div className="h-screen"></div>
+    <div>
+      <CallToAction/>
+    </div>
   );
 }
