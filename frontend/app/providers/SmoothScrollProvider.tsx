@@ -1,14 +1,14 @@
 // lenis-provider.tsx
 "use client";
-import { ReactLenis } from "lenis/react";
-import { FC, useRef } from "react";
+import { ReactLenis, LenisRef } from "lenis/react";
+import { useRef } from "react";
 
 type LenisScrollProviderProps = {
   children: React.ReactNode;
 };
 
 export default function SmoothScrollProvider({ children }: LenisScrollProviderProps) {
-  const lenisRef = useRef<any>(null);
+  const lenisRef = useRef< LenisRef | null >(null);
 
   return (
     <ReactLenis 
