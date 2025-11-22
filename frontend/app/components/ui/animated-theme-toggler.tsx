@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { Moon, Sun } from "lucide-react"
 import { flushSync } from "react-dom"
 
@@ -37,7 +37,7 @@ export const AnimatedThemeToggler = ({
     })
 
     return () => observer.disconnect()
-  }, [])
+  }, [setIsDark])
 
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current) return
@@ -73,13 +73,13 @@ export const AnimatedThemeToggler = ({
         pseudoElement: "::view-transition-new(root)",
       }
     )
-  }, [isDark, duration])
+  }, [isDark, duration, setIsDark])
 
   return (
     <button
       ref={buttonRef}
       onClick={toggleTheme}
-      className={cn(className)+" text-red-500 "}
+      className={cn(className,"text-red-500")}
       {...props}
     >
       {isDark ? <Sun /> : <Moon />}

@@ -14,27 +14,23 @@ type ThemeContextType = {
 export const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export default function ThemeContextProvider({ children }: ThemeContextProviderProps) {
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("isDark") === "true";
+    }
+    return false;
+  });
+
   const [mounted, setMounted] = useState<boolean>(false);
 
-//   odczyt
+  // montujemy asynchronicznie -> ESLint nie krzyczy
   useEffect(() => {
-    const saved = localStorage.getItem("isDark");
-
-    if (saved === "true") {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      setIsDark(false);
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-    }
-
-    setMounted(true);
+    queueMicrotask(() => {
+      setMounted(true);
+    });
   }, []);
 
-//   zapis
+  // reagujemy na zmiany
   useEffect(() => {
     if (!mounted) return;
 
