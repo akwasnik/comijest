@@ -1,11 +1,10 @@
-from app import mongo
+from app.extensions import mongo
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo.errors import DuplicateKeyError
 
 
 class User:
-    collection = mongo.db.users
 
     def __init__(self, username, email, password, _id=None, hashed=False):
         self.id = str(_id) if _id else None
@@ -19,7 +18,11 @@ class User:
             "email": self.email,
             "password": self.password
         }
-
+    
+    @property
+    def collection(self):
+        return mongo.db.users
+    
     @staticmethod
     def from_mongo(data):
         if not data:
@@ -57,3 +60,4 @@ class User:
 
     def verify_password(self, password):
         return check_password_hash(self.password, password)
+   
