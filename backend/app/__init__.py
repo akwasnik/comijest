@@ -6,12 +6,10 @@ from pymongo import MongoClient
 import certifi
 def create_app():
     app = Flask(__name__)
-    # app.config["MONGO_URI"] = MONGO_URI
 
-
-    # mongo.init_app(app)
     client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
-    mongo = client["comijest"]
+    
+    app.mongo = client["comijest"]
 
     try:
         print("Connection sucess Using DB:", mongo.db.name)
