@@ -33,7 +33,7 @@ export default function Header() {
             O nas
           </Link>
 
-          <Link href="/account" className="text-red-400 hover:text-red-700">
+          <Link href="/login" className="text-red-400 hover:text-red-700">
             <User size={30} />
           </Link>
         </div>
