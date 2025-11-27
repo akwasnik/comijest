@@ -10,9 +10,8 @@ def app():
     ctx = app.app_context()
     ctx.push()
 
-    yield app  # <-- testy działają tutaj
+    yield app
 
-    # Po testach zamykamy kontekst
     ctx.pop()
 @pytest.fixture
 def client(app):

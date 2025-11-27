@@ -2,7 +2,7 @@ def test_user_create_endpoint(client):
     response = client.post("/users/create", json={
         "username": "testuser",
         "email": "test@test.com",
-        "password": "Testpassword1"
+        "password": "Testpassword1!"
     })
 
     assert response.status_code == 201
@@ -14,7 +14,7 @@ def test_user_get_all_endpoint(client):
     client.post("/users/create", json={
         "username": "kamil",
         "email": "kamil@test.com",
-        "password": "Testpassword1"
+        "password": "Testpassword1!"
     })
 
     response = client.get("/users/")
@@ -27,12 +27,12 @@ def test_update_user_endpoint(client):
     create_res = client.post("/users/create", json={
         "username": "oldname",
         "email": "old@test.com",
-        "password": "Testpassword1"
+        "password": "Testpassword1!"
     })
     user_id = create_res.get_json()["id"]
 
     update_res = client.put(f"/users/{user_id}", json={
-        "username": "newname"
+        "password": "TestPassword2@"
     })
 
     assert update_res.status_code == 200
@@ -43,7 +43,7 @@ def test_delete_user_endpoint(client):
     create_res = client.post("/users/create", json={
         "username": "delete_me",
         "email": "del@test.com",
-        "password": "Testpassword1"
+        "password": "Testpassword1!"
     })
     user_id = create_res.get_json()["id"]
 
@@ -52,3 +52,52 @@ def test_delete_user_endpoint(client):
 
     get_res = client.get(f"/users/{user_id}")
     assert get_res.status_code == 404
+
+def test_update_user_invalid_password_endpoint(client):
+    create_res = client.post("/users/create", json={
+        "username": "oldname",
+        "email": "old@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id = create_res.get_json()["id"]
+
+    update_res = client.put(f"/users/{user_id}", json={
+        "password": "TestPassword1"
+    })
+
+    assert update_res.status_code == 400
+    updated = update_res.get_json()
+    assert updated["errors"]["password"][0] == "Password must contain at least 1 special character"
+
+def test_update_user_invalid_username_endpoint(client):
+    create_res = client.post("/users/create", json={
+        "username": "oldname",
+        "email": "old@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id = create_res.get_json()["id"]
+
+    update_res = client.put(f"/users/{user_id}", json={
+        "username": "ok"
+    })
+
+    assert update_res.status_code == 400
+    updated = update_res.get_json()
+    assert updated["errors"]["username"][0] == "Username too short"
+
+def test_update_user_email_and_username_endpoint(client):
+    create_res = client.post("/users/create", json={
+        "username": "oldname",
+        "email": "old@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id = create_res.get_json()["id"]
+
+    update_res = client.put(f"/users/{user_id}", json={
+        "username": "oki",
+        "password": "TestPassword!1"
+    })
+
+    assert update_res.status_code == 200
+    updated = update_res.get_json()
+    assert updated["message"]==True

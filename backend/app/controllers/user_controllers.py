@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from ..schemes.user_scheme import UserSchema
+from ..schemes.user_scheme import UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
 from marshmallow import ValidationError
 
@@ -10,7 +10,6 @@ class UserController:
         try:
             data = UserSchema().load(request.get_json())
         except ValidationError as err:
-            print(err.messages)
             return {"errors": err.messages}, 400
         user = UserService.create_user(
             data["username"],
@@ -37,6 +36,10 @@ class UserController:
 
     @staticmethod
     def update(user_id):
+        try:
+            data = UpdateUserSchema().load(request.get_json())
+        except ValidationError as err:
+            return {"errors": err.messages}, 400
         data = request.json
         updated = UserService.update_user(user_id, data)
         return jsonify({"message": updated}), 200

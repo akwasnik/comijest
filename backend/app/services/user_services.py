@@ -8,7 +8,8 @@ class UserService:
     def create_user(username, email, password):
         if UserRepository.find_by_email(email):
             return None
-
+        if UserRepository.find_by_username(username):
+            return None
         hashed = generate_password_hash(password)
         user = User(username, email, hashed)
 
