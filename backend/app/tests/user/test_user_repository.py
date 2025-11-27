@@ -1,5 +1,5 @@
-from ..repositories.user_repository import UserRepository
-from ..models.user import User
+from ...repositories.user_repository import UserRepository
+from ...models.user import User
 
 
 def test_create_and_find_user(app):

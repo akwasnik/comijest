@@ -1,7 +1,6 @@
 from flask import current_app
 from bson import ObjectId
 from ..models.user import User
-
 class UserRepository:
 
     @staticmethod
@@ -35,11 +34,11 @@ class UserRepository:
 
     @staticmethod
     def update(user_id, data):
-        UserRepository.collection().update_one(
+        updated = UserRepository.collection().update_one(
             {"_id": ObjectId(user_id)},
             {"$set": data}
         )
-        return UserRepository.find_by_id(user_id)
+        return updated.acknowledged
 
     @staticmethod
     def delete(user_id):

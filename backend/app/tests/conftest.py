@@ -7,9 +7,13 @@ def app():
     app = create_app()
 
     app.mongo = mongomock.MongoClient().db_for_tests
+    ctx = app.app_context()
+    ctx.push()
 
-    yield app
+    yield app  # <-- testy działają tutaj
 
+    # Po testach zamykamy kontekst
+    ctx.pop()
 @pytest.fixture
 def client(app):
     return app.test_client()

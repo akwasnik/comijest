@@ -1,4 +1,4 @@
-from ..services.user_services import UserService
+from ...services.user_services import UserService
 
 def test_create_user(app):
     user = UserService.create_user("adam", "adam@test.com", "pass123")
@@ -21,8 +21,8 @@ def test_update_user_service(app):
         {"username": "ania"}
     )
 
-    assert updated is not None
-    assert updated.username == "ania"
+    assert updated is True
+    assert UserService.get_user_by_id(user_id).username == "ania"
 
 def test_delete_user_service(app):
     user = UserService.create_user("ola", "ola@test.com", "pass123")

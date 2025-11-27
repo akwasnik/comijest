@@ -37,7 +37,7 @@ def test_update_user_endpoint(client):
 
     assert update_res.status_code == 200
     updated = update_res.get_json()
-    assert updated["username"] == "newname"
+    assert updated["message"] == True
 
 def test_delete_user_endpoint(client):
     create_res = client.post("/users/create", json={

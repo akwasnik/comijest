@@ -33,7 +33,7 @@ class UserController:
     def update(user_id):
         data = request.json
         updated = UserService.update_user(user_id, data)
-        return jsonify(updated.to_dict()), 200
+        return jsonify({"message": updated}), 200
 
     @staticmethod
     def delete(user_id):
