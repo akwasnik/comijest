@@ -1,8 +1,7 @@
 from flask import Flask
-from flask_pymongo import PyMongo
+from .extensions import mongo
 from app.config import MONGO_URI
-
-mongo = PyMongo()
+from .routes.user_routes import user_bp
 
 def create_app():
     app = Flask(__name__)
@@ -15,5 +14,5 @@ def create_app():
         print("Connection sucess Using DB:", mongo.db.name)
     except Exception as e:
         print("Connection failed:", e)
-    #blueprints (routes) here
+    app.register_blueprint(user_bp, url_prefix="/users")
     return app
