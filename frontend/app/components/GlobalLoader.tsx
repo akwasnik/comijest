@@ -5,6 +5,7 @@ import Image from "next/image";
 
 export default function GlobalLoader() {
   const [visible, setVisible] = useState(true);
+  const [shouldRender, setShouldRender] = useState(true);
 
   useEffect(() => {
     const MIN_TIME = 600;
@@ -15,6 +16,20 @@ export default function GlobalLoader() {
 
     return () => clearTimeout(timer);
   }, []);
+
+// ODLACZANIE KOMPONENTU DLA OPTYMALNOSCI
+
+  useEffect(() => {
+    if (!visible) {
+      const timeout = setTimeout(() => {
+        setShouldRender(false);
+      }, 700);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [visible]);
+
+  if (!shouldRender) return null;
 
   return (
     <div
