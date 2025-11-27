@@ -34,7 +34,7 @@ export default function GlobalLoader() {
   return (
     <div
       className={`
-        fixed inset-0 z-[9999]
+        fixed inset-0 z-9999
         flex items-center justify-center
         bg-white dark:bg-neutral-950
         transition-opacity duration-500 
