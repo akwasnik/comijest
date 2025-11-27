@@ -1,11 +1,17 @@
 from flask import request, jsonify
+from ..schemes.user_scheme import UserSchema
 from ..services.user_services import UserService
+from marshmallow import ValidationError
 
 class UserController:
 
     @staticmethod
     def create():
-        data = request.json
+        try:
+            data = UserSchema().load(request.get_json())
+        except ValidationError as err:
+            print(err.messages)
+            return {"errors": err.messages}, 400
         user = UserService.create_user(
             data["username"],
             data["email"],

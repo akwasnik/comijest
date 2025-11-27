@@ -2,7 +2,7 @@ def test_user_create_endpoint(client):
     response = client.post("/users/create", json={
         "username": "testuser",
         "email": "test@test.com",
-        "password": "123"
+        "password": "Testpassword1"
     })
 
     assert response.status_code == 201
@@ -14,7 +14,7 @@ def test_user_get_all_endpoint(client):
     client.post("/users/create", json={
         "username": "kamil",
         "email": "kamil@test.com",
-        "password": "abc"
+        "password": "Testpassword1"
     })
 
     response = client.get("/users/")
@@ -27,7 +27,7 @@ def test_update_user_endpoint(client):
     create_res = client.post("/users/create", json={
         "username": "oldname",
         "email": "old@test.com",
-        "password": "123"
+        "password": "Testpassword1"
     })
     user_id = create_res.get_json()["id"]
 
@@ -43,7 +43,7 @@ def test_delete_user_endpoint(client):
     create_res = client.post("/users/create", json={
         "username": "delete_me",
         "email": "del@test.com",
-        "password": "123"
+        "password": "Testpassword1"
     })
     user_id = create_res.get_json()["id"]
 
