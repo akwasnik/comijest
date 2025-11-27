@@ -27,7 +27,18 @@ class UserService:
 
     @staticmethod
     def update_user(user_id, data):
+        if "username" in data:
+            existing = UserRepository.find_by_username(data["username"])
+            if existing and existing.id != user_id:
+                return "Username taken" #placeholder
+        if "email" in data:
+            existing = UserRepository.find_by_email(data["email"])
+            if existing and existing.id != user_id:
+                return "Email taken" #placeholder
         if "password" in data:
+            same_password = check_password_hash(UserRepository.find_by_id(user_id).password, data["password"])
+            if same_password:
+                return "thats the same password" #placeholder
             data["password"] = generate_password_hash(data["password"])
 
         return UserRepository.update(user_id, data)
