@@ -1,68 +1,36 @@
+from werkzeug.security import generate_password_hash, check_password_hash
 from ..models.user import User
 from ..repositories.user_repository import UserRepository
-
 
 class UserService:
 
     @staticmethod
-    def save_user(username, email, password):
-
+    def create_user(username, email, password):
         if UserRepository.find_by_email(email):
-            return {"error": "Email already exists"}
+            return None
 
-        if UserRepository.find_by_username(username):
-            return {"error": "Username already exists"}
+        hashed = generate_password_hash(password)
+        user = User(username, email, hashed)
 
-        user = User(username, email, password)
-        result = UserRepository.insert(user.to_dict())
-        user.id = str(result.inserted_id)
-
+        user_id = UserRepository.create(user)
+        user.id = user_id
         return user
-
 
     @staticmethod
     def get_users():
-        users = UserRepository.find_all()
-        return [User.from_mongo(u) for u in users]
+        return UserRepository.find_all()
 
     @staticmethod
     def get_user_by_id(user_id):
-        data = UserRepository.find_by_id(user_id)
-        return User.from_mongo(data)
+        return UserRepository.find_by_id(user_id)
 
     @staticmethod
     def update_user(user_id, data):
-        user_data = UserRepository.find_by_id(user_id)
-        if not user_data:
-            return None
-
-        user = User.from_mongo(user_data)
-
-        # update fields
-        if "username" in data:
-            existing = UserRepository.find_by_username(data["username"])
-            if existing and str(existing["_id"]) != user.id:
-                return {"error": "Username already in use"}
-            user.username = data["username"]
-
-        if "email" in data:
-            existing = UserRepository.find_by_email(data["email"])
-            if existing and str(existing["_id"]) != user.id:
-                return {"error": "Email already in use"}
-            user.email = data["email"]
-
         if "password" in data:
-            user.password = User(data["username"], data["email"], data["password"]).password
+            data["password"] = generate_password_hash(data["password"])
 
-        UserRepository.update(user_id, user.to_dict())
-
-        return user
+        return UserRepository.update(user_id, data)
 
     @staticmethod
     def delete_user(user_id):
-        user = UserRepository.find_by_id(user_id)
-        if not user:
-            return None
-
-        result = UserRepository.delete(user_id)
-        return result.deleted_count > 0
+        return UserRepository.delete(user_id)
