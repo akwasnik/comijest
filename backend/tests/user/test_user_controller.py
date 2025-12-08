@@ -101,3 +101,43 @@ def test_update_user_email_and_username_endpoint(client):
     assert update_res.status_code == 200
     updated = update_res.get_json()
     assert updated["message"]==True
+
+def test_update_user_username_taken_endpoint(client):
+    create_res1 = client.post("/users/create", json={
+        "username": "oldname",
+        "email": "old@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id1 = create_res1.get_json()["id"]
+
+    create_res2 = client.post("/users/create", json={
+        "username": "newname",
+        "email": "new@test.com",
+        "password": "Testpassword1!"
+    })
+
+    update_res = client.put(f"/users/{user_id1}", json={
+        "username": "newname"
+    })
+
+    assert update_res.status_code == 409
+
+def test_update_user_email_taken_endpoint(client):
+    create_res1 = client.post("/users/create", json={
+        "username": "oldname",
+        "email": "old@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id1 = create_res1.get_json()["id"]
+
+    create_res2 = client.post("/users/create", json={
+        "username": "newname",
+        "email": "new@test.com",
+        "password": "Testpassword1!"
+    })
+
+    update_res = client.put(f"/users/{user_id1}", json={
+        "email": "new@test.com"
+    })
+
+    assert update_res.status_code == 409

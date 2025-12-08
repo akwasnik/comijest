@@ -1,6 +1,5 @@
-from ...repositories.user_repository import UserRepository
-from ...models.user import User
-
+from app.repositories.user_repository import UserRepository
+from app.models.user import User
 
 def test_create_and_find_user(app):
     user = User("john", "john@test.com", "hashed_password")

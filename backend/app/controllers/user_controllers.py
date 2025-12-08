@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from ..schemes.user_scheme import UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
-from exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
+from ..exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
 from marshmallow import ValidationError
 
 class UserController:

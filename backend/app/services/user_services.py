@@ -1,6 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
+from ..exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
 from ..models.user import User
 from ..repositories.user_repository import UserRepository
 
