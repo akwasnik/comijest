@@ -1,5 +1,5 @@
 import re
-from marshmallow import Schema, fields, ValidationError, validate
+from marshmallow import Schema, fields, ValidationError, validate, validates_schema
 
 SPECIAL_CHARS = r"!@#$^&*()_\-+=\[\]{};:,.?/"
 
@@ -37,3 +37,8 @@ class UpdateUserSchema(Schema):
     email = fields.Email()
     username = fields.String(validate=validate.Length(min=3, error="Username too short"))
     password = fields.String(validate=validate_password)
+    
+    @validates_schema
+    def validate_not_empty(self, data, **kwargs):
+        if not data:
+            raise ValidationError("At least one field must be provided.")

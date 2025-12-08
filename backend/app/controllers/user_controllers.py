@@ -10,15 +10,16 @@ class UserController:
     def create():
         try:
             data = UserSchema().load(request.get_json())
+        
+            user = UserService.create_user(
+                data["username"],
+                data["email"],
+                data["password"]
+            )
+            if not user:
+                return jsonify({"message": "User already exists"}), 409
         except ValidationError as err:
             return {"errors": err.messages}, 400
-        user = UserService.create_user(
-            data["username"],
-            data["email"],
-            data["password"]
-        )
-        if not user:
-            return jsonify({"message": "User already exists"}), 409
 
         return jsonify({"id": user.id, "username": user.username}), 201
 
