@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from ..schemes.user_scheme import UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
+from exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
 from marshmallow import ValidationError
 
 class UserController:
@@ -38,11 +39,17 @@ class UserController:
     def update(user_id):
         try:
             data = UpdateUserSchema().load(request.get_json())
+            data = request.json
+            updated = UserService.update_user(user_id, data)
+            return jsonify({"message": updated}), 200
         except ValidationError as err:
-            return {"errors": err.messages}, 400
-        data = request.json
-        updated = UserService.update_user(user_id, data)
-        return jsonify({"message": updated}), 200
+            return jsonify({"errors": err.messages}), 400
+        except UsernameTakenError as err:
+            return jsonify({"error": "Username already taken"}), 409
+        except EmailTakenError as err:
+            return jsonify({"error": "Email already taken"}), 409
+        except SamePasswordError as err:
+            return jsonify({"error": "New password cannot be the same as the old one"}), 400
 
     @staticmethod
     def delete(user_id):

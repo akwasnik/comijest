@@ -1,4 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
 from ..models.user import User
 from ..repositories.user_repository import UserRepository
 
@@ -30,15 +32,15 @@ class UserService:
         if "username" in data:
             existing = UserRepository.find_by_username(data["username"])
             if existing and existing.id != user_id:
-                return "Username taken" #placeholder
+                raise UsernameTakenError()
         if "email" in data:
             existing = UserRepository.find_by_email(data["email"])
             if existing and existing.id != user_id:
-                return "Email taken" #placeholder
+                raise EmailTakenError()
         if "password" in data:
             same_password = check_password_hash(UserRepository.find_by_id(user_id).password, data["password"])
             if same_password:
-                return "thats the same password" #placeholder
+                raise SamePasswordError()
             data["password"] = generate_password_hash(data["password"])
 
         return UserRepository.update(user_id, data)
