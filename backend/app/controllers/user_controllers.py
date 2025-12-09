@@ -1,18 +1,25 @@
 from flask import request, jsonify
+from ..schemes.user_scheme import UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
+from ..exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
+from marshmallow import ValidationError
 
 class UserController:
 
     @staticmethod
     def create():
-        data = request.json
-        user = UserService.create_user(
-            data["username"],
-            data["email"],
-            data["password"]
-        )
-        if not user:
-            return jsonify({"message": "User already exists"}), 409
+        try:
+            data = UserSchema().load(request.get_json())
+        
+            user = UserService.create_user(
+                data["username"],
+                data["email"],
+                data["password"]
+            )
+            if not user:
+                return jsonify({"message": "User already exists"}), 409
+        except ValidationError as err:
+            return {"errors": err.messages}, 400
 
         return jsonify({"id": user.id, "username": user.username}), 201
 
@@ -31,9 +38,19 @@ class UserController:
 
     @staticmethod
     def update(user_id):
-        data = request.json
-        updated = UserService.update_user(user_id, data)
-        return jsonify({"message": updated}), 200
+        try:
+            data = UpdateUserSchema().load(request.get_json())
+            data = request.json
+            updated = UserService.update_user(user_id, data)
+            return jsonify({"message": updated}), 200
+        except ValidationError as err:
+            return jsonify({"errors": err.messages}), 400
+        except UsernameTakenError as err:
+            return jsonify({"error": "Username already taken"}), 409
+        except EmailTakenError as err:
+            return jsonify({"error": "Email already taken"}), 409
+        except SamePasswordError as err:
+            return jsonify({"error": "New password cannot be the same as the old one"}), 400
 
     @staticmethod
     def delete(user_id):
