@@ -6,7 +6,7 @@ import certifi
 def create_app():
     app = Flask(__name__)
 
-    client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
+    client = MongoClient(MONGO_URI)
     app.mongo = client["comijest"]
 
     try:

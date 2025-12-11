@@ -7,6 +7,7 @@ class User:
 
     def to_dict(self):
         return {
+            "id": self.id,
             "username": self.username,
             "email": self.email,
             "password": self.password
@@ -17,8 +18,8 @@ class User:
         if not data:
             return None
         return User(
+            _id=str(data["_id"]),
             username=data["username"],
             email=data["email"],
             password=data["password"],
-            _id=data["_id"]
         )
