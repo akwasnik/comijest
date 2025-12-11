@@ -1,0 +1,29 @@
+# --- PYTHON ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# --- IDE (Ustawienia edytora) ---
+.idea/
+.vscode/
+
+# --- DANE (Data) ---
+# Ignorujemy przetworzone, bo skrypt je wygeneruje
+data/processed/
+
+# --- MODELE (Models) ---
+# To jest najważniejsze! Modele są za ciężkie na GitHuba.
+/models/*
+!ML/models/.gitkeep
+
+# --- RAPORTY ---
+# Wykresy warto trzymać, ale pliki pośrednie .pkl są zbędne
+ML/reports/*.pkl
+
+# --- LOGI I PLIKI TYMCZASOWE ---
+logs/
+results/
+results_*/
+temp_*/
