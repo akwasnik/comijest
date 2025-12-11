@@ -45,6 +45,7 @@ services:
     networks:
       - comijest_net
     restart: unless-stopped
+    
   mongo:
     image: mongo:8.2
     container_name: comijest_mongo
@@ -53,22 +54,6 @@ services:
       - mongo_data:/data/db
     networks:
       - comijest_net
-
-  nginx:
-    image: nginx:1.29
-    container_name: comijest_nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-    depends_on:
-      - frontend
-    networks:
-      - comijest_net
-    restart: unless-stopped
-    
 
 networks:
   comijest_net:
