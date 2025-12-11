@@ -1,0 +1,26 @@
+FROM python:3.10-slim AS builder
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
+
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY --from=builder /install /usr/local
+
+COPY . .
+
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -f http://localhost:5000/users || exit 1
+
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "-w", "4", "-k", "gthread", "app:app"]

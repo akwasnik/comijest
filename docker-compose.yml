@@ -1,18 +1,56 @@
-version: "3.9"
-
 services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: comijest_backend
+    expose:
+      - "5000"          # widoczne tylko w sieci dockera
+    environment:
+      - MONGO_DB_CONNECTION_STRING=mongodb://mongo:27017/comijest
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    networks:
+      - comijest_net
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: comijest_frontend
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
+      - NEXT_PUBLIC_API_URL=https://comijest.pl/api
       - NODE_ENV=production
     restart: unless-stopped
-    # depends_on:
-    #   - backend
+    depends_on:
+      - backend
+    networks:
+      - comijest_net
+
+  nginx:
+    image: nginx:1.29
+    container_name: comijest_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - frontend
+    networks:
+      - comijest_net
+    restart: unless-stopped
+  mongo:
+    image: mongo:8.2
+    container_name: comijest_mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
     networks:
       - comijest_net
 
@@ -35,3 +73,6 @@ services:
 networks:
   comijest_net:
     driver: bridge
+
+volumes:
+  mongo_data:
