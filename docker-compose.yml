@@ -7,6 +7,7 @@ services:
     expose:
       - "5000"          # widoczne tylko w sieci dockera
     environment:
+      - MONGO_DB_CONNECTION_STRING=mongodb://mongo:mongo@mongo:27017/comijest
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
@@ -19,9 +20,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: comijest_frontend
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
+      - NEXT_PUBLIC_API_URL=https://comijest.pl/api
       - NODE_ENV=production
     restart: unless-stopped
     depends_on:
@@ -44,7 +46,7 @@ services:
       - comijest_net
     restart: unless-stopped
   mongo:
-    image: mongo
+    image: mongo:8.2
     container_name: comijest_mongo
     restart: unless-stopped
     volumes:
