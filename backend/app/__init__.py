@@ -15,3 +15,5 @@ def create_app():
         print("Connection failed:", e)
     app.register_blueprint(user_bp, url_prefix="/users")
     return app
+
+app = create_app()
