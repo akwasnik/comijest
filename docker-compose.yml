@@ -1,6 +1,19 @@
 version: "3.9"
 
 services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: comijest_backend
+    expose:
+      - "5000"          # widoczne tylko w sieci dockera
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    networks:
+      - comijest_net
   frontend:
     build:
       context: ./frontend
