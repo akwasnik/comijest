@@ -13,7 +13,7 @@ def create_app():
         print("Connection sucess Using DB:", app.mongo.db.name)
     except Exception as e:
         print("Connection failed:", e)
-    app.register_blueprint(user_bp, url_prefix="/users")
+    app.register_blueprint(user_bp, url_prefix="/api/users")
     return app
 
 app = create_app()
