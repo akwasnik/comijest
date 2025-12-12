@@ -29,7 +29,7 @@ export default function Header() {
         <AnimatedThemeToggler />
 
         <div className="flex items-center gap-6 pr-2">
-          <Link href="/about" className="text-md font-bold text-red-400 hover:text-red-700">
+          <Link href="/onas" className="text-md font-bold text-red-400 hover:text-red-700">
             O nas
           </Link>
 
