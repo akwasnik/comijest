@@ -76,7 +76,7 @@ export default function LoginForm() {
       {/* Link do rejestracji */}
       <p className="text-center mt-6 text-sm text-gray-700 dark:text-neutral-400">
         Nie masz konta?{" "}
-        <a href="/pages/register" className="text-red-500 font-semibold hover:text-red-700 transition">
+        <a href="/register" className="text-red-500 font-semibold hover:text-red-700 transition">
           Zarejestruj się
         </a>
       </p>
