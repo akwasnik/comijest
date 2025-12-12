@@ -1,14 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback , useRef } from "react";
 import { Moon, Sun } from "lucide-react";
 import { flushSync } from "react-dom";
 import { cn } from "@/app/lib/utils";
-import { Spinner } from "./spinner";
 import { useTheme } from "next-themes";
 
-interface AnimatedThemeTogglerProps
-  extends React.ComponentPropsWithoutRef<"button"> {
+interface AnimatedThemeTogglerProps extends React.ComponentPropsWithoutRef<"button"> {
   duration?: number;
 }
 
@@ -17,13 +15,18 @@ export const AnimatedThemeToggler = ({
   duration = 400,
   ...props
 }: AnimatedThemeTogglerProps) => {
-  const [mounted, setMounted] = useState(false)
+
   const {setTheme, resolvedTheme} =  useTheme();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-    const toggleTheme = useCallback(async () => {
+  const toggleTheme = useCallback(async () => {
     if (!buttonRef.current) return;
     const newTheme = resolvedTheme === "dark" ? false : true;
+
+    if (!('startViewTransition' in document)) {
+      // @ts-expect-error js-only lib to jest
+      await import('view-transitions-polyfill');
+    }
 
     await document.startViewTransition(() => {
       flushSync(() => {
@@ -56,14 +59,6 @@ export const AnimatedThemeToggler = ({
     
   }, [duration, resolvedTheme, setTheme]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return (
-      <Spinner className="text-red-500"/>
-  );
 
   return (
     <button
