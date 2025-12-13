@@ -14,7 +14,7 @@ class User:
         }
 
     @staticmethod
-    def from_mongo(data):
+    def from_mongo_one(data):
         if not data:
             return None
         return User(
@@ -23,3 +23,14 @@ class User:
             email=data["email"],
             password=data["password"],
         )
+    
+    @staticmethod
+    def from_mongo_many(data):
+        if not data:
+            return None
+        return User(
+            _id=str(data["_id"]),
+            username=data["username"],
+            email=data["email"],
+        )
+

@@ -1,7 +1,7 @@
 from flask import request, jsonify
-from ..schemes.user_scheme import UserSchema, UpdateUserSchema
+from ..schemes.user_scheme import UserLoginSchema, UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
-from ..exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
+from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
 from marshmallow import ValidationError
 
 class UserController:
@@ -19,10 +19,21 @@ class UserController:
             if not user:
                 return jsonify({"message": "User already exists"}), 409
         except ValidationError as err:
-            return {"errors": err.messages}, 400
+            return jsonify({"errors": err.messages}), 400
 
         return jsonify({"id": user.id, "username": user.username}), 201
 
+    @staticmethod
+    def login():
+        try:
+            data = UserLoginSchema().load(request.get_json())
+            token = UserService.login_user(data["email"], data["password"])
+            return jsonify(access_token=token), 200
+        except ValidationError as err:
+            return jsonify({"errors": err.messages}), 400
+        except InvalidPasswordOrEmail as err:
+            return jsonify({"errors": "Invalid email or password"})
+    
     @staticmethod
     def get_all():
         users = UserService.get_users()
@@ -56,3 +67,4 @@ class UserController:
     def delete(user_id):
         UserService.delete_user(user_id)
         return jsonify({"message": "User deleted"}), 200
+

@@ -15,22 +15,22 @@ class UserRepository:
     @staticmethod
     def find_by_id(user_id):
         data = UserRepository.collection().find_one({"_id": ObjectId(user_id)})
-        return User.from_mongo(data)
+        return User.from_mongo_one(data)
 
     @staticmethod
     def find_by_email(email):
         data = UserRepository.collection().find_one({"email": email})
-        return User.from_mongo(data)
+        return User.from_mongo_one(data)
 
     @staticmethod
     def find_by_username(username):
         data = UserRepository.collection().find_one({"username": username})
-        return User.from_mongo(data)
+        return User.from_mongo_one(data)
 
     @staticmethod
     def find_all():
         users = UserRepository.collection().find({})
-        return [User.from_mongo(u) for u in users]
+        return [User.from_mongo_many(u) for u in users]
 
     @staticmethod
     def update(user_id, data):

@@ -1,6 +1,7 @@
+from flask import jsonify
+from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
-
-from ..exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
+from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
 from ..models.user import User
 from ..repositories.user_repository import UserRepository
 
@@ -48,3 +49,11 @@ class UserService:
     @staticmethod
     def delete_user(user_id):
         return UserRepository.delete(user_id)
+    
+    @staticmethod
+    def login_user(email, password):
+        user = UserRepository.find_by_email(email)
+        if user:
+            if check_password_hash(user.password, password):
+                return jsonify(create_access_token(identity=user.id))
+        raise InvalidPasswordOrEmail

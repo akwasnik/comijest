@@ -1,9 +1,10 @@
 from flask import Flask
-from .config import MONGO_URI
+from .config import JWT_SECRET, MONGO_URI
 from .routes.user_routes import user_bp
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pymongo import MongoClient
-import certifi
+from flask_jwt_extended import JWTManager
+
 def create_app():
     app = Flask(__name__)
 
@@ -16,14 +17,25 @@ def create_app():
         x_host=1
     )
 
+    #configuration for jwt
+    app.config["JWT_SECRET_KEY"] = JWT_SECRET
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_HEADER_NAME"] = "Authorization"
+    app.config["JWT_HEADER_TYPE"] = "Bearer"
+
+    jwt = JWTManager(app)
+
     client = MongoClient(MONGO_URI)
+
     app.mongo = client["comijest"]
 
     try:
-        print("Connection sucess Using DB:", app.mongo.db.name)
+        print("Connected to DB")
     except Exception as e:
         print("Connection failed:", e)
+    
     app.register_blueprint(user_bp, url_prefix="/api/users")
+
     return app
 
 app = create_app()
