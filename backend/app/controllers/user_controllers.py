@@ -1,4 +1,5 @@
 from flask import request, jsonify
+from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, set_refresh_cookies, unset_jwt_cookies
 from ..schemes.user_scheme import UserLoginSchema, UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
 from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
@@ -27,8 +28,12 @@ class UserController:
     def login():
         try:
             data = UserLoginSchema().load(request.get_json())
-            token = UserService.login_user(data["email"], data["password"])
-            return jsonify({"acces_token": token}), 200
+            access, refresh = UserService.login_user(
+                data["email"], data["password"]
+            )
+            response = jsonify(access_token=access)
+            set_refresh_cookies(response, refresh)
+            return response, 200
         except ValidationError as err:
             return jsonify({"errors": err.messages}), 400
         except InvalidPasswordOrEmail as err:
@@ -68,3 +73,20 @@ class UserController:
         UserService.delete_user(user_id)
         return jsonify({"message": "User deleted"}), 200
 
+    @staticmethod
+    def refresh():
+        user_id = get_jwt_identity()
+        claims = get_jwt()
+
+        new_access = create_access_token(
+            identity=user_id,
+            additional_claims={"role": claims.get("role")}
+        )
+
+        return jsonify(access_token=new_access), 200
+    
+    @staticmethod
+    def logout():
+        response = jsonify({"msg": "logout"})
+        unset_jwt_cookies(response)
+        return response, 200

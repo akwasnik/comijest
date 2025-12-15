@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import Flask
 from flask_cors import CORS
 from .config import JWT_SECRET, MONGO_URI
@@ -28,10 +29,16 @@ def create_app():
 
     #configuration for jwt
     app.config["JWT_SECRET_KEY"] = JWT_SECRET
-    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
+    app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token"
     app.config["JWT_HEADER_NAME"] = "Authorization"
     app.config["JWT_HEADER_TYPE"] = "Bearer"
+    # app.config["JWT_COOKIE_SECURE"] = True          # HTTPS ONLY (PROD)
+    app.config["JWT_COOKIE_SAMESITE"] = "None"
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
     jwt = JWTManager(app)
 
     client = MongoClient(MONGO_URI)

@@ -1,4 +1,4 @@
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
 from ..models.user import User
@@ -54,5 +54,18 @@ class UserService:
         user = UserRepository.find_by_email_for_login(email)
         if user:
             if check_password_hash(user.password, password):
-                return create_access_token(identity=user.id, additional_claims={"role": user.role})
+                additional_claims = {
+                    "role": user.role
+                }
+
+                access_token = create_access_token(
+                    identity=user.id,
+                    additional_claims=additional_claims
+                )
+
+                refresh_token = create_refresh_token(
+                    identity=user.id,
+                    additional_claims=additional_claims
+                )
+                return access_token, refresh_token
         raise InvalidPasswordOrEmail
