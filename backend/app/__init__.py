@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from .config import JWT_SECRET, MONGO_URI
 from .routes.user_routes import user_bp
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -7,7 +8,15 @@ from flask_jwt_extended import JWTManager
 
 def create_app():
     app = Flask(__name__)
-
+    cors = CORS(
+    app,
+    resources={r"/api/*": {
+        "origins": ["https://comijest.com.pl"],
+        "allow_headers": ["Authorization", "Content-Type"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    }},
+    supports_credentials=True
+    )
     app.url_map.strict_slashes = False
 
     app.wsgi_app = ProxyFix(
