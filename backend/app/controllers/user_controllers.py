@@ -28,16 +28,16 @@ class UserController:
         try:
             data = UserLoginSchema().load(request.get_json())
             token = UserService.login_user(data["email"], data["password"])
-            return jsonify(access_token=token), 200
+            return jsonify({"acces_token": token}), 200
         except ValidationError as err:
             return jsonify({"errors": err.messages}), 400
         except InvalidPasswordOrEmail as err:
-            return jsonify({"errors": "Invalid email or password"})
+            return jsonify({"errors": "Invalid email or password"}), 400
     
     @staticmethod
     def get_all():
         users = UserService.get_users()
-        return jsonify([u.to_dict() for u in users]), 200
+        return jsonify([u.to_public_dict() for u in users]), 200
 
     @staticmethod
     def get_one(user_id):
@@ -45,7 +45,7 @@ class UserController:
         if not user:
             return jsonify({"message": "User not found"}), 404
 
-        return jsonify(user.to_dict()), 200
+        return jsonify(user.to_public_dict()), 200
 
     @staticmethod
     def update(user_id):

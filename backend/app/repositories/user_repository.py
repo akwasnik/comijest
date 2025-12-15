@@ -15,22 +15,25 @@ class UserRepository:
     @staticmethod
     def find_by_id(user_id):
         data = UserRepository.collection().find_one({"_id": ObjectId(user_id)})
-        return User.from_mongo_one(data)
+        return User.from_mongo(data)
 
     @staticmethod
     def find_by_email(email):
         data = UserRepository.collection().find_one({"email": email})
-        return User.from_mongo_one(data)
+        return User.from_mongo(data)
 
     @staticmethod
     def find_by_username(username):
         data = UserRepository.collection().find_one({"username": username})
-        return User.from_mongo_one(data)
+        return User.from_mongo(data)
 
     @staticmethod
     def find_all():
-        users = UserRepository.collection().find({})
-        return [User.from_mongo_many(u) for u in users]
+        cursor = UserRepository.collection().find(
+            {},
+            {"username": 1, "email": 1}
+        )
+        return [User.from_mongo(u) for u in cursor]
 
     @staticmethod
     def update(user_id, data):
@@ -44,3 +47,11 @@ class UserRepository:
     def delete(user_id):
         UserRepository.collection().delete_one({"_id": ObjectId(user_id)})
         return True
+
+    @staticmethod
+    def find_by_email_for_login(email):
+        data = UserRepository.collection().find_one(
+            {"email": email},
+            {"username": 1, "email": 1, "password": 1, "role": 1}
+        )
+        return User.from_mongo(data)

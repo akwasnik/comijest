@@ -1,4 +1,3 @@
-from flask import jsonify
 from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
@@ -52,8 +51,8 @@ class UserService:
     
     @staticmethod
     def login_user(email, password):
-        user = UserRepository.find_by_email(email)
+        user = UserRepository.find_by_email_for_login(email)
         if user:
             if check_password_hash(user.password, password):
-                return jsonify(create_access_token(identity=user.id))
+                return create_access_token(identity=user.id, additional_claims={"role": user.role})
         raise InvalidPasswordOrEmail
