@@ -1,9 +1,8 @@
 from flask import Blueprint
 from flask_jwt_extended import jwt_required
-
 from ..utils.is_admin import admin_required
 from ..controllers.user_controllers import UserController
-
+from ..extensions import limiter
 user_bp = Blueprint("users", __name__)
 
 user_bp.post("/create", endpoint="create_user")(
@@ -26,12 +25,20 @@ user_bp.delete("/<user_id>", endpoint="delete_user")(
     admin_required()(UserController.delete)
 )
 
-user_bp.post("/login", endpoint="login")(
-    UserController.login
+user_bp.post(
+    "/login",
+    endpoint="login"
+)(
+    limiter.limit("5 per minute")(UserController.login)
 )
 
-user_bp.post("/refresh", endpoint="refresh")(
-    jwt_required(refresh=True)(UserController.refresh)
+user_bp.post(
+    "/refresh",
+    endpoint="refresh"
+)(
+    limiter.limit("10 per minute")(
+        jwt_required(refresh=True)(UserController.refresh)
+    )
 )
 
 user_bp.post("/logout", endpoint='logout')(UserController.logout)
