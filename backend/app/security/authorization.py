@@ -5,16 +5,35 @@ from .persmission import ROLE_PERMISSIONS
 def has_permission(permission):
     claims = get_jwt()
     role = claims.get("role")
-    return permission in ROLE_PERMISSIONS(role, set())
+    return permission in ROLE_PERMISSIONS.get(role, set())
 
-def permission_required(permission):
+
+def has_any_permission(permissions):
+    claims = get_jwt()
+    role = claims.get("role")
+    role_permissions = ROLE_PERMISSIONS.get(role, set())
+    return any(p in role_permissions for p in permissions)
+
+
+def permission_required_any(permissions):
     def wrapper(fn):
         def inner(*args, **kwargs):
-            if not has_permission(permission):
+            if not has_any_permission(permissions):
                 return jsonify({"msg": "forbidden"}), 403
             return fn(*args, **kwargs)
         return inner
     return wrapper
+
+
+def permission_required(permissions):
+    def wrapper(fn):
+        def inner(*args, **kwargs):
+            if not has_permission(permissions):
+                return jsonify({"msg": "forbidden"}), 403
+            return fn(*args, **kwargs)
+        return inner
+    return wrapper
+
 
 def can_acces_user(target_user_id):
     claims = get_jwt()

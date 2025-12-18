@@ -57,9 +57,9 @@ class UserController:
 
     @staticmethod
     def update(user_id):
+        if not can_acces_user(user_id):
+            return jsonify({"msg": "forbidden"}), 403
         try:
-            if not can_acces_user(user_id):
-                return {"msg": "forbidden"}, 403
             data = UpdateUserSchema().load(request.get_json())
             data = request.json
             updated = UserService.update_user(user_id, data)
