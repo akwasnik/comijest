@@ -1,5 +1,5 @@
 def test_user_create_endpoint(client):
-    response = client.post("/users/create", json={
+    response = client.post("api/users/create", json={
         "username": "testuser",
         "email": "test@test.com",
         "password": "Testpassword1!"
