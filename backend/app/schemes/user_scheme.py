@@ -42,3 +42,7 @@ class UpdateUserSchema(Schema):
     def validate_not_empty(self, data, **kwargs):
         if not data:
             raise ValidationError("At least one field must be provided.")
+
+class UserLoginSchema(Schema):
+    email = fields.Email(required=True)
+    password = fields.String(required=True, validate=validate_password)

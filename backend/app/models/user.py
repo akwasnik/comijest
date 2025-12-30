@@ -1,14 +1,22 @@
 class User:
-    def __init__(self, username, email, password, _id=None):
+    def __init__(self, username, email, password=None, role="user",_id=None):
         self.id = str(_id) if _id else None
         self.username = username
         self.email = email
-        self.password = password  # hashed
+        self.password = password
+        self.role = role
 
-    def to_dict(self):
+    def to_public_dict(self):
         return {
             "id": self.id,
             "username": self.username,
+            "email": self.email,
+            "role": self.role
+        }
+
+    def to_auth_dict(self):
+        return {
+            "id": self.id,
             "email": self.email,
             "password": self.password
         }
@@ -18,8 +26,9 @@ class User:
         if not data:
             return None
         return User(
-            _id=str(data["_id"]),
+            _id=data["_id"],
             username=data["username"],
             email=data["email"],
-            password=data["password"],
+            password=data.get("password"),
+            role=data.get("role", "user")
         )

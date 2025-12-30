@@ -1,7 +1,10 @@
 from flask import request, jsonify
-from ..schemes.user_scheme import UserSchema, UpdateUserSchema
+from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, set_refresh_cookies, unset_jwt_cookies
+
+from ..security.authorization import can_acces_user
+from ..schemes.user_scheme import UserLoginSchema, UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
-from ..exceptions.user_exceptions import EmailTakenError, SamePasswordError, UsernameTakenError
+from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
 from marshmallow import ValidationError
 
 class UserController:
@@ -19,25 +22,43 @@ class UserController:
             if not user:
                 return jsonify({"message": "User already exists"}), 409
         except ValidationError as err:
-            return {"errors": err.messages}, 400
+            return jsonify({"errors": err.messages}), 400
 
         return jsonify({"id": user.id, "username": user.username}), 201
 
     @staticmethod
+    def login():
+        try:
+            data = UserLoginSchema().load(request.get_json())
+            access, refresh = UserService.login_user(
+                data["email"], data["password"]
+            )
+            response = jsonify(access_token=access)
+            set_refresh_cookies(response, refresh)
+            return response, 200
+        except ValidationError as err:
+            return jsonify({"errors": err.messages}), 400
+        except InvalidPasswordOrEmail as err:
+            return jsonify({"errors": "Invalid email or password"}), 400
+    
+    @staticmethod
     def get_all():
         users = UserService.get_users()
-        return jsonify([u.to_dict() for u in users]), 200
+        return jsonify([u.to_public_dict() for u in users]), 200
 
     @staticmethod
     def get_one(user_id):
         user = UserService.get_user_by_id(user_id)
         if not user:
             return jsonify({"message": "User not found"}), 404
-
-        return jsonify(user.to_dict()), 200
+        if not can_acces_user(user_id):
+            return {"msg": "forbidden"}, 403
+        return jsonify(user.to_public_dict()), 200
 
     @staticmethod
     def update(user_id):
+        if not can_acces_user(user_id):
+            return jsonify({"msg": "forbidden"}), 403
         try:
             data = UpdateUserSchema().load(request.get_json())
             data = request.json
@@ -56,3 +77,21 @@ class UserController:
     def delete(user_id):
         UserService.delete_user(user_id)
         return jsonify({"message": "User deleted"}), 200
+
+    @staticmethod
+    def refresh():
+        user_id = get_jwt_identity()
+        claims = get_jwt()
+
+        new_access = create_access_token(
+            identity=user_id,
+            additional_claims={"role": claims.get("role")}
+        )
+
+        return jsonify(access_token=new_access), 200
+    
+    @staticmethod
+    def logout():
+        response = jsonify({"msg": "logout"})
+        unset_jwt_cookies(response)
+        return response, 200

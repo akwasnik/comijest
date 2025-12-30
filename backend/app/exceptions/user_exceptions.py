@@ -9,3 +9,6 @@ class EmailTakenError(Exception):
 class SamePasswordError(Exception):
     """Raised when new password is identical to current password."""
     pass
+class InvalidPasswordOrEmail(Exception):
+    """Raised when invalid password or email are provided for login"""
+    pass
