@@ -2,17 +2,23 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function CallToAction() {
   const reduceMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <section className="relative overflow-hidden py-16 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="relative bg-red-50/70 dark:bg-red-400/10 border border-red-100 dark:border-none rounded-3xl px-6 py-12 md:px-12 md:py-16 text-center shadow-[0_18px_40px_rgba(220,38,38,0.18)]">
 
-          {/* dekoracyjne animowane kółka */}
-          {!reduceMotion && (
+          {/* 🔒 heartbeat renderujemy DOPIERO po mount */}
+          {mounted && !reduceMotion && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <div className="heartbeat-wrapper">
                 <div className="heartbeat-ring heartbeat-ring-1" />
@@ -22,7 +28,7 @@ export default function CallToAction() {
           )}
 
           <motion.h2
-            initial={{ opacity: 0, y: 12 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="relative text-3xl md:text-4xl font-semibold text-red-700 mb-4"
@@ -31,7 +37,7 @@ export default function CallToAction() {
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0, y: 8 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.4 }}
             className="relative text-sm md:text-base text-red-900/80 dark:text-white max-w-xl mx-auto mb-8"
@@ -40,7 +46,7 @@ export default function CallToAction() {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.3 }}
             className="relative"
