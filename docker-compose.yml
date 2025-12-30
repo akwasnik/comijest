@@ -13,6 +13,7 @@ services:
     restart: unless-stopped
     depends_on:
       - mongo
+      - redis
     networks:
       - comijest_net
   frontend:
@@ -52,6 +53,12 @@ services:
     restart: unless-stopped
     volumes:
       - mongo_data:/data/db
+    networks:
+      - comijest_net
+  
+  redis:
+    image: redis:7-alpine
+    restart: always
     networks:
       - comijest_net
 
