@@ -14,7 +14,7 @@ def create_app():
     cors = CORS(
     app,
     resources={r"/api/*": {
-        "origins": ["https://localhost:5000"],
+        "origins": ["*"],
         "allow_headers": ["Authorization", "Content-Type"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     }},
@@ -38,7 +38,7 @@ def create_app():
     # app.config["JWT_COOKIE_SECURE"] = True         # HTTPS ONLY (PROD)
     app.config["JWT_COOKIE_SAMESITE"] = "None"
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-    # app.config["RATELIMIT_STORAGE_URI"] = "redis://redis:6379" #PROD
+    app.config["RATELIMIT_STORAGE_URI"] = "redis://redis:6379" #PROD
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
     jwt = JWTManager(app)

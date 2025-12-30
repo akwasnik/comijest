@@ -5,6 +5,15 @@ class User:
         self.email = email
         self.password = password
         self.role = role
+        
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "role": self.role,
+            "password": self.password
+        }
 
     def to_public_dict(self):
         return {

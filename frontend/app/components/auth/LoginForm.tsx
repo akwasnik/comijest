@@ -3,12 +3,43 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
+
+interface LoginPayload {
+  email: string;
+  password: string;
+}
 
 export default function LoginForm() {
+  
+  const loginMutation = useMutation({
+    mutationFn: async (payload: LoginPayload) => {
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error?.message || "Błąd logowania");
+      }
+
+      const resss = await res.json()
+      console.log(resss);
+      return res.json();
+    },
+  });
+
+  
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="w-full max-w-sm bg-white dark:bg-neutral-900 p-8 rounded-2xl shadow-lg border border-red-300"
     >
@@ -19,22 +50,29 @@ export default function LoginForm() {
       <Formik
         initialValues={{ email: "", password: "" }}
         validationSchema={Yup.object({
-          email: Yup.string().email("Niepoprawny email").required("Wymagane"),
-          password: Yup.string().min(6, "Minimum 6 znaków").required("Wymagane"),
+          email: Yup.string()
+            .email("Niepoprawny email")
+            .required("Wymagane"),
+          password: Yup.string()
+            .min(6, "Minimum 6 znaków")
+            .required("Wymagane"),
         })}
-        onSubmit={(values) => {
-          console.log("Wysyłam:", values);
+        onSubmit={(values, { setSubmitting }) => {
+          loginMutation.mutate(values, {
+            onSettled: () => setSubmitting(false),
+          });
         }}
       >
         {({ isSubmitting }) => (
           <Form className="space-y-4">
+
             {/* Email */}
             <div>
               <Field
                 name="email"
                 type="email"
                 placeholder="Adres e-mail"
-                className="w-full p-3 rounded-xl border dark:border-neutral-700 border-gray-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-red-500 transition"
+                className="w-full p-3 rounded-xl border dark:border-neutral-700 border-gray-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-red-500"
               />
               <ErrorMessage
                 name="email"
@@ -49,7 +87,7 @@ export default function LoginForm() {
                 name="password"
                 type="password"
                 placeholder="Hasło"
-                className="w-full p-3 rounded-xl border dark:border-neutral-700 border-gray-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-red-500 transition"
+                className="w-full p-3 rounded-xl border dark:border-neutral-700 border-gray-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-red-500"
               />
               <ErrorMessage
                 name="password"
@@ -58,25 +96,33 @@ export default function LoginForm() {
               />
             </div>
 
+            {/* Backend error */}
+            {loginMutation.isError && (
+              <p className="text-sm text-red-600 text-center">
+                {(loginMutation.error as Error).message}
+              </p>
+            )}
+
             {/* Submit */}
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 200 }}
               type="submit"
-              disabled={isSubmitting}
-              className="w-full p-3 bg-red-500 text-white rounded-xl font-semibold shadow-md hover:bg-red-600 transition"
+              disabled={isSubmitting || loginMutation.isPending}
+              className="w-full p-3 bg-red-500 text-white rounded-xl font-semibold shadow-md hover:bg-red-600 transition disabled:opacity-60"
             >
-              Zaloguj
+              {loginMutation.isPending ? "Loguję..." : "Zaloguj"}
             </motion.button>
           </Form>
         )}
       </Formik>
 
-      {/* Link do rejestracji */}
       <p className="text-center mt-6 text-sm text-gray-700 dark:text-neutral-400">
         Nie masz konta?{" "}
-        <a href="/register" className="text-red-500 font-semibold hover:text-red-700 transition">
+        <a
+          href="/register"
+          className="text-red-500 font-semibold hover:text-red-700 transition"
+        >
           Zarejestruj się
         </a>
       </p>

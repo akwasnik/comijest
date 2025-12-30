@@ -3,12 +3,37 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
+
+interface RegisterPayload {
+  username: string;
+  email: string;
+  password: string;
+}
 
 export default function RegisterForm() {
+  const registerMutation = useMutation({
+    mutationFn: async (payload: RegisterPayload) => {
+      const res = await fetch("http://localhost:5000/api/users/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        throw new Error("Błąd rejestracji");
+      }
+
+      return res.json();
+    },
+  });
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="w-full max-w-sm bg-white dark:bg-neutral-900 p-8 rounded-2xl shadow-lg border border-red-300"
     >
@@ -17,20 +42,78 @@ export default function RegisterForm() {
       </h1>
 
       <Formik
-        initialValues={{ email: "", password: "", confirm: "" }}
+        initialValues={{
+          username: "",
+          email: "",
+          password: "",
+          confirm: "",
+        }}
         validationSchema={Yup.object({
-          email: Yup.string().email("Niepoprawny email").required("Wymagane"),
-          password: Yup.string().min(6, "Min. 6 znaków").required("Wymagane"),
+          username: Yup.string()
+            .min(3, "Min. 3 znaki")
+            .required("Wymagane"),
+
+          email: Yup.string()
+            .email("Niepoprawny email")
+            .required("Wymagane"),
+
+          password: Yup.string()
+            .min(12, "Hasło musi mieć min. 12 znaków")
+            .test(
+              "has-uppercase",
+              "Hasło musi zawierać wielką literę",
+              (value) => !!value && [...value].some((c) => c >= "A" && c <= "Z")
+            )
+            .test(
+              "has-lowercase",
+              "Hasło musi zawierać małą literę",
+              (value) => !!value && [...value].some((c) => c >= "a" && c <= "z")
+            )
+            .test(
+              "has-digit",
+              "Hasło musi zawierać cyfrę",
+              (value) => !!value && [...value].some((c) => c >= "0" && c <= "9")
+            )
+            .test(
+              "has-special",
+              "Hasło musi zawierać znak specjalny",
+              (value) =>
+                !!value &&
+                [...value].some(
+                  (c) => !/[a-zA-Z0-9]/.test(c)
+                )
+            )
+            .required("Wymagane"),
+
           confirm: Yup.string()
             .oneOf([Yup.ref("password")], "Hasła się nie zgadzają")
             .required("Wymagane"),
         })}
-        onSubmit={(values) => {
-          console.log("Rejestruję:", values);
+        onSubmit={(values, { setSubmitting }) => {
+          registerMutation.mutate(
+            {
+              username: values.username,
+              email: values.email,
+              password: values.password,
+            },
+            {
+              onSettled: () => setSubmitting(false),
+            }
+          );
         }}
       >
         {({ isSubmitting }) => (
           <Form className="space-y-4">
+
+            {/* Username */}
+            <div>
+              <Field
+                name="username"
+                placeholder="Nazwa użytkownika"
+                className="w-full p-3 rounded-xl border dark:border-neutral-700 bg-white dark:bg-neutral-800 border-gray-300 outline-none focus:ring-2 focus:ring-red-500"
+              />
+              <ErrorMessage name="username" component="div" className="text-red-600 text-sm mt-1" />
+            </div>
 
             {/* Email */}
             <div>
@@ -38,7 +121,7 @@ export default function RegisterForm() {
                 name="email"
                 type="email"
                 placeholder="Adres e-mail"
-                className="w-full p-3 rounded-xl border dark:border-neutral-700 bg-white dark:bg-neutral-800 border-gray-300 outline-none focus:ring-2 focus:ring-red-500 transition"
+                className="w-full p-3 rounded-xl border dark:border-neutral-700 bg-white dark:bg-neutral-800 border-gray-300 outline-none focus:ring-2 focus:ring-red-500"
               />
               <ErrorMessage name="email" component="div" className="text-red-600 text-sm mt-1" />
             </div>
@@ -49,18 +132,18 @@ export default function RegisterForm() {
                 name="password"
                 type="password"
                 placeholder="Hasło"
-                className="w-full p-3 rounded-xl border dark:border-neutral-700 bg-white dark:bg-neutral-800 border-gray-300 outline-none focus:ring-2 focus:ring-red-500 transition"
+                className="w-full p-3 rounded-xl border dark:border-neutral-700 bg-white dark:bg-neutral-800 border-gray-300 outline-none focus:ring-2 focus:ring-red-500"
               />
               <ErrorMessage name="password" component="div" className="text-red-600 text-sm mt-1" />
             </div>
 
-            {/* Confirm password */}
+            {/* Confirm */}
             <div>
               <Field
                 name="confirm"
                 type="password"
                 placeholder="Powtórz hasło"
-                className="w-full p-3 rounded-xl border dark:border-neutral-700 bg-white dark:bg-neutral-800 border-gray-300 outline-none focus:ring-2 focus:ring-red-500 transition"
+                className="w-full p-3 rounded-xl border dark:border-neutral-700 bg-white dark:bg-neutral-800 border-gray-300 outline-none focus:ring-2 focus:ring-red-500"
               />
               <ErrorMessage name="confirm" component="div" className="text-red-600 text-sm mt-1" />
             </div>
@@ -69,21 +152,19 @@ export default function RegisterForm() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 200 }}
               type="submit"
-              disabled={isSubmitting}
-              className="w-full p-3 bg-red-500 text-white rounded-xl font-semibold shadow-md hover:bg-red-600 transition"
+              disabled={isSubmitting || registerMutation.isPending}
+              className="w-full p-3 bg-red-500 text-white rounded-xl font-semibold shadow-md hover:bg-red-600 transition disabled:opacity-60"
             >
-              Zarejestruj
+              {registerMutation.isPending ? "Rejestruję..." : "Zarejestruj"}
             </motion.button>
           </Form>
         )}
       </Formik>
 
-      {/* Link do logowania */}
       <p className="text-center mt-6 text-sm text-gray-700 dark:text-neutral-400">
         Masz konto?{" "}
-        <a href="/login" className="text-red-500 font-semibold hover:text-red-700 transition">
+        <a href="/login" className="text-red-500 font-semibold hover:text-red-700">
           Zaloguj się
         </a>
       </p>
