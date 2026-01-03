@@ -33,13 +33,13 @@ class UserController:
             access, refresh = UserService.login_user(
                 data["email"], data["password"]
             )
-            response = jsonify(access_token=access)
+            response = jsonify(access_token=access, refresh_token=refresh)
             set_refresh_cookies(response, refresh)
             return response, 200
         except ValidationError as err:
             return jsonify({"errors": err.messages}), 400
         except InvalidPasswordOrEmail as err:
-            return jsonify({"errors": "Invalid email or password"}), 400
+            return jsonify({"errors": "Invalid email or password"}), 401
     
     @staticmethod
     def get_all():

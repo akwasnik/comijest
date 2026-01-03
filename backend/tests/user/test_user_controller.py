@@ -177,3 +177,8 @@ def test_update_user_email_taken(client, admin_headers):
     )
 
     assert res.status_code == 409
+
+def test_logout(client):
+    res = client.post("/api/users/logout")
+    assert res.status_code == 200
+    assert res.get_json()["msg"] == "logout"

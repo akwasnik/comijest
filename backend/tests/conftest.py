@@ -1,6 +1,6 @@
 import pytest
 import mongomock
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 from app import create_app
 
 ROLE_PERMISSIONS = {
@@ -91,3 +91,35 @@ def user_with_token(client):
 
     headers = {"Authorization": f"Bearer {token}"}
     return user_id, headers
+
+@pytest.fixture
+def user_tokens(client):
+    res = client.post("/api/users/create", json={
+        "username": "refreshuser",
+        "email": "refresh@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id = res.get_json()["id"]
+
+    access_token = create_access_token(
+        identity=user_id,
+        additional_claims={
+            "role": "user",
+            "permissions": ["user:read_self", "user:update_self"]
+        }
+    )
+
+    refresh_token = create_refresh_token(
+        identity=user_id,
+        additional_claims={
+            "role": "user"
+        }
+    )
+
+    return {
+        "user_id": user_id,
+        "access": access_token,
+        "refresh": refresh_token,
+        "access_headers": {"Authorization": f"Bearer {access_token}"},
+        "refresh_headers": {"Authorization": f"Bearer {refresh_token}"}
+    }
