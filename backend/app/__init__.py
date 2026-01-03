@@ -29,8 +29,12 @@ def create_app():
         x_host=1
     )
 
+    if testing:
+        app.config["JWT_SECRET_KEY"] = "test_secret"
+    else:
+        app.config["RATELIMIT_STORAGE_URI"] = "redis://redis:6379"
+        app.config["JWT_SECRET_KEY"] = JWT_SECRET
     #configuration for jwt and cookies
-    app.config["JWT_SECRET_KEY"] = JWT_SECRET
     app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
     app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token"
     app.config["JWT_HEADER_NAME"] = "Authorization"
@@ -38,7 +42,6 @@ def create_app():
     # app.config["JWT_COOKIE_SECURE"] = True         # HTTPS ONLY (PROD)
     app.config["JWT_COOKIE_SAMESITE"] = "None"
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-    app.config["RATELIMIT_STORAGE_URI"] = "redis://redis:6379" #PROD
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
     jwt = JWTManager(app)
