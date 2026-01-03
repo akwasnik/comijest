@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, set_refresh_cookies, unset_jwt_cookies
 
-from ..security.authorization import can_acces_user
+from ..security.authorization import can_access_user
 from ..schemes.user_scheme import UserLoginSchema, UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
 from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
@@ -51,13 +51,13 @@ class UserController:
         user = UserService.get_user_by_id(user_id)
         if not user:
             return jsonify({"message": "User not found"}), 404
-        if not can_acces_user(user_id):
+        if not can_access_user(user_id):
             return {"msg": "forbidden"}, 403
         return jsonify(user.to_public_dict()), 200
 
     @staticmethod
     def update(user_id):
-        if not can_acces_user(user_id):
+        if not can_access_user(user_id):
             return jsonify({"msg": "forbidden"}), 403
         try:
             data = UpdateUserSchema().load(request.get_json())

@@ -1,56 +1,6 @@
 import pytest
 from flask_jwt_extended import create_access_token
 
-ROLE_PERMISSIONS = {
-    "admin": {
-        "user:read",
-        "user:write",
-        "user:delete",
-        "user:list",
-    },
-    "user": {
-        "user:read_self",
-        "user:update_self",
-    },
-}
-
-# =========================
-# FIXTURES
-# =========================
-
-@pytest.fixture
-def admin_headers():
-    token = create_access_token(
-        identity="admin-id",
-        additional_claims={
-            "role": "admin",
-            "permissions": list(ROLE_PERMISSIONS["admin"])
-        }
-    )
-    return {"Authorization": f"Bearer {token}"}
-
-
-@pytest.fixture
-def user_headers():
-    token = create_access_token(
-        identity="user-id",
-        additional_claims={
-            "role": "user",
-            "permissions": list(ROLE_PERMISSIONS["user"])
-        }
-    )
-    return {"Authorization": f"Bearer {token}"}
-
-
-@pytest.fixture
-def created_user(client):
-    res = client.post("/api/users/create", json={
-        "username": "testuser",
-        "email": "test@test.com",
-        "password": "Testpassword1!"
-    })
-    return res.get_json()["id"]
-
 
 # =========================
 # ADMIN TESTS
@@ -87,19 +37,24 @@ def test_admin_can_delete_user(client, admin_headers, created_user):
 # USER TESTS (POSITIVE)
 # =========================
 
-def test_user_can_get_self(client, user_headers):
-    # identity = user-id
-    res = client.get("/api/users/user-id", headers=user_headers)
+def test_user_can_get_self(client, user_with_token):
+    user_id, headers = user_with_token
+
+    res = client.get(f"/api/users/{user_id}", headers=headers)
     assert res.status_code == 200
 
 
-def test_user_can_update_self(client, user_headers):
+def test_user_can_update_self(client, user_with_token):
+    user_id, headers = user_with_token
+
     res = client.put(
-        "/api/users/user-id",
-        headers=user_headers,
+        f"/api/users/{user_id}",
+        headers=headers,
         json={"username": "selfupdate"}
     )
+
     assert res.status_code == 200
+
 
 
 # =========================

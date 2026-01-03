@@ -1,7 +1,7 @@
 ROLE_PERMISSIONS = {
     "admin": {
         "user:read",
-        "user:write",
+        "user:update",
         "user:delete",
         "user:list",
     },

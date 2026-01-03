@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from .extensions import limiter, jwt
 
 
-def create_app():
+def create_app(testing=False):
     app = Flask(__name__)
     cors = CORS(
     app,
@@ -29,7 +29,11 @@ def create_app():
     )
 
     #configuration for jwt and cookies
-    app.config["JWT_SECRET_KEY"] = JWT_SECRET
+    if testing:
+        app.config["JWT_SECRET_KEY"] = "test_secret"
+    else:
+        app.config["JWT_SECRET_KEY"] = JWT_SECRET
+    
     app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
     app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token"
     app.config["JWT_HEADER_NAME"] = "Authorization"
