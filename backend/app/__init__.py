@@ -31,6 +31,7 @@ def create_app(testing=False):
     #configuration for jwt and cookies
     if testing:
         app.config["JWT_SECRET_KEY"] = "test_secret"
+        app.config["RATELIMIT_STORAGE_URI"] = "memory://"
     else:
         app.config["JWT_SECRET_KEY"] = JWT_SECRET
     
