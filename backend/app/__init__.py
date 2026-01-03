@@ -27,7 +27,6 @@ def create_app(testing=False):
         x_proto=1,
         x_host=1
     )
-
     #configuration for jwt and cookies
     if testing:
         app.config["JWT_SECRET_KEY"] = "test_secret"
