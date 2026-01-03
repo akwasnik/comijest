@@ -3,25 +3,35 @@ name: Backend CI
 on:
   push:
     paths:
-      - 'backend/**'
+      - "backend/**"
   pull_request:
     paths:
-      - 'backend/**'
+      - "backend/**"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-    #   - name: Install deps
-    #     run: |
-    #       cd backend
-    #       pip install -r requirements.txt
-    #   - name: Run tests
-    #     run: |
-    #       cd backend
-    #       pytest
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        env:
+          FLASK_ENV: testing
+          SECRET_KEY: test-secret
+          JWT_SECRET_KEY: test-jwt-secret
+        run: |
+          cd backend
+          pytest --cov=app
