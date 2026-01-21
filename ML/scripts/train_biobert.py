@@ -1,6 +1,5 @@
 import os
 
-# NAPRAWA BŁĘDU KERAS (Musi być na samej górze!)
 os.environ['TF_USE_LEGACY_KERAS'] = '1'
 
 import pandas as pd
