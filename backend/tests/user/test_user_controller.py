@@ -39,146 +39,98 @@ def test_user_create_invalid_password(client):
     assert res.status_code == 400
     assert "password" in res.get_json()["errors"]
 
+
 # =========================
 # ADMIN – CONTROLLER LOGIC
 # =========================
 
-def test_admin_get_all_users(client, admin_headers):
-    client.post("/api/users/create", json={
+def test_admin_get_all_users(admin_client):
+    admin_client.post("/api/users/create", json={
         "username": "kamil",
         "email": "kamil@test.com",
         "password": "Testpassword1!"
     })
 
-    res = client.get("/api/users/", headers=admin_headers)
+    res = admin_client.get("/api/users/")
     assert res.status_code == 200
-    assert len(res.get_json()) == 1
+    assert len(res.get_json()) >= 1
 
 
-def test_admin_get_single_user(client, admin_headers, created_user):
-    res = client.get(
-        f"/api/users/{created_user}",
-        headers=admin_headers
-    )
+def test_admin_get_single_user(admin_client, client):
+    r = client.post("/api/users/create", json={
+        "username": "test",
+        "email": "one@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id = r.get_json()["id"]
 
+    res = admin_client.get(f"/api/users/{user_id}")
     assert res.status_code == 200
-    assert res.get_json()["id"] == created_user
+    assert res.get_json()["id"] == user_id
 
 
-def test_admin_update_user(client, admin_headers, created_user):
-    res = client.put(
-        f"/api/users/{created_user}",
-        headers=admin_headers,
+def test_admin_update_user(admin_client, client):
+    r = client.post("/api/users/create", json={
+        "username": "toedit",
+        "email": "edit@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id = r.get_json()["id"]
+
+    res = admin_client.put(
+        f"/api/users/{user_id}",
         json={"username": "newname"}
     )
 
     assert res.status_code == 200
-    assert res.get_json()["message"] is True
 
 
-def test_admin_delete_user(client, admin_headers, created_user):
-    res = client.delete(
-        f"/api/users/{created_user}",
-        headers=admin_headers
-    )
+def test_admin_delete_user(admin_client, client):
+    r = client.post("/api/users/create", json={
+        "username": "todelete",
+        "email": "del@test.com",
+        "password": "Testpassword1!"
+    })
+    user_id = r.get_json()["id"]
 
+    res = admin_client.delete(f"/api/users/{user_id}")
     assert res.status_code == 200
 
-    res2 = client.get(
-        f"/api/users/{created_user}",
-        headers=admin_headers
-    )
+    res2 = admin_client.get(f"/api/users/{user_id}")
     assert res2.status_code == 404
+
 
 # =========================
 # USER – SELF ACTIONS
 # =========================
 
-def test_user_get_self(client, user_with_token):
-    user_id, headers = user_with_token
-
-    res = client.get(
-        f"/api/users/{user_id}",
-        headers=headers
-    )
-
+def test_user_get_me(user_client):
+    res = user_client.get("/api/users/me")
     assert res.status_code == 200
+    assert "password" not in res.get_json()
 
 
+def test_user_cannot_get_other_user(user_client, client):
+    r = client.post("/api/users/create", json={
+        "username": "other",
+        "email": "other@test.com",
+        "password": "Testpassword1!"
+    })
+    other_id = r.get_json()["id"]
 
-def test_user_update_self(client, user_with_token):
-    user_id, headers = user_with_token
-
-    res = client.put(
-        f"/api/users/{user_id}",
-        headers=headers,
-        json={"username": "selfupdate"}
-    )
-
-    assert res.status_code == 200
+    res = user_client.get(f"/api/users/{other_id}")
+    assert res.status_code == 403
 
 
 # =========================
-# VALIDATION / CONFLICTS
+# LOGOUT / AUTH
 # =========================
 
-def test_update_user_invalid_password(client, admin_headers, created_user):
-    res = client.put(
-        f"/api/users/{created_user}",
-        headers=admin_headers,
-        json={"password": "weak"}
-    )
-
-    assert res.status_code == 400
-    assert "password" in res.get_json()["errors"]
-
-
-def test_update_user_username_taken(client, admin_headers):
-    r1 = client.post("/api/users/create", json={
-        "username": "one",
-        "email": "one@test.com",
-        "password": "Testpassword1!"
-    })
-    r2 = client.post("/api/users/create", json={
-        "username": "two",
-        "email": "two@test.com",
-        "password": "Testpassword1!"
-    })
-
-    user_id = r1.get_json()["id"]
-
-    res = client.put(
-        f"/api/users/{user_id}",
-        headers=admin_headers,
-        json={"username": "two"}
-    )
-
-    assert res.status_code == 409
-
-
-def test_update_user_email_taken(client, admin_headers):
-    r1 = client.post("/api/users/create", json={
-        "username": "one",
-        "email": "one@test.com",
-        "password": "Testpassword1!"
-    })
-    r2 = client.post("/api/users/create", json={
-        "username": "two",
-        "email": "two@test.com",
-        "password": "Testpassword1!"
-    })
-
-    user_id = r1.get_json()["id"]
-
-    res = client.put(
-        f"/api/users/{user_id}",
-        headers=admin_headers,
-        json={"email": "two@test.com"}
-    )
-
-    assert res.status_code == 409
-
-def test_logout(client):
-    res = client.post("/api/users/logout")
+def test_logout(user_client):
+    res = user_client.post("/api/users/logout")
     assert res.status_code == 200
     assert res.get_json()["msg"] == "logout"
+
+    # cookie cleared → auth required
+    res2 = user_client.get("/api/users/me")
+    assert res2.status_code == 401

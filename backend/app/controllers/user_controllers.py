@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, set_refresh_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, jwt_required, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 
 from ..security.authorization import can_access_user
 from ..schemes.user_scheme import UserLoginSchema, UserSchema, UpdateUserSchema
@@ -26,20 +26,23 @@ class UserController:
 
         return jsonify({"id": user.id, "username": user.username}), 201
 
-    @staticmethod
+
     def login():
         try:
             data = UserLoginSchema().load(request.get_json())
+
             access, refresh = UserService.login_user(
                 data["email"], data["password"]
             )
-            response = jsonify(access_token=access, refresh_token=refresh)
+
+            response = jsonify({"msg": "logged in"})
+
+            set_access_cookies(response, access)
             set_refresh_cookies(response, refresh)
+
             return response, 200
-        except ValidationError as err:
-            return jsonify({"errors": err.messages}), 400
-        except InvalidPasswordOrEmail as err:
-            return jsonify({"errors": "Invalid email or password"}), 401
+        except InvalidPasswordOrEmail:
+            return jsonify({"error": "Invalid email or password"}), 401
     
     @staticmethod
     def get_all():
@@ -79,19 +82,43 @@ class UserController:
         return jsonify({"message": "User deleted"}), 200
 
     @staticmethod
+    @jwt_required(refresh=True)
     def refresh():
         user_id = get_jwt_identity()
         claims = get_jwt()
-
+    
         new_access = create_access_token(
             identity=user_id,
             additional_claims={"role": claims.get("role")}
         )
-
-        return jsonify(access_token=new_access), 200
     
+        response = jsonify({"msg": "token refreshed"})
+        set_access_cookies(response, new_access)
+    
+        return response, 200
+    
+ 
     @staticmethod
     def logout():
         response = jsonify({"msg": "logout"})
         unset_jwt_cookies(response)
         return response, 200
+    
+    @staticmethod
+    @jwt_required()
+    def update_me():
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        UserService.update_user(user_id, data)
+        return {"message": True}, 200
+    
+    @staticmethod
+    @jwt_required()
+    def get_me():
+        user_id = get_jwt_identity()
+        user = UserService.get_user_by_id(user_id)
+    
+        if not user:
+            return {"msg": "User not found"}, 404
+    
+        return user.to_public_dict(), 200

@@ -10,7 +10,14 @@ user_bp.post("/create", endpoint="create_user")((UserController.create))
 user_bp.get("/", endpoint="get_users")(
     permission_required("user:list")(UserController.get_all)
 )
-
+user_bp.get(
+    "/me",
+    endpoint="get_me"
+)(
+    permission_required_any(["user:read_self"])(
+        jwt_required()(UserController.get_me)
+    )
+)
 user_bp.get(
     "/<user_id>", 
     endpoint="get_user"
@@ -18,7 +25,14 @@ user_bp.get(
     permission_required_any(["user:read", "user:read_self"])(
     jwt_required()(UserController.get_one))
 )
-
+user_bp.put(
+    "/me",
+    endpoint="update_me"
+)(
+    permission_required_any(["user:update_self"])(
+        jwt_required()(UserController.update_me)
+    )
+)
 user_bp.put(
     "/<user_id>", 
     endpoint="update_user"

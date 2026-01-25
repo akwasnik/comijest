@@ -1,7 +1,4 @@
-from flask_jwt_extended import decode_token
-
-
-def test_login_success(client):
+def test_login_success_sets_cookies(client):
     client.post("/api/users/create", json={
         "username": "loginuser",
         "email": "login@test.com",
@@ -15,10 +12,9 @@ def test_login_success(client):
 
     assert res.status_code == 200
 
-    data = res.get_json()
-    assert "access_token" in data
-    assert "refresh_token" in data
+    cookies = res.headers.getlist("Set-Cookie")
 
+    assert any("access_token_cookie=" in c for c in cookies)
 
 def test_login_invalid_password(client):
     client.post("/api/users/create", json={
@@ -34,6 +30,8 @@ def test_login_invalid_password(client):
 
     assert res.status_code == 401
 
+    cookies = res.headers.getlist("Set-Cookie")
+    assert cookies == []  # no cookies if error
 
 def test_login_rate_limit(client):
     client.post("/api/users/create", json={
@@ -54,3 +52,19 @@ def test_login_rate_limit(client):
     })
 
     assert res.status_code == 429
+
+
+def test_login_cookie_allows_access(client):
+    client.post("/api/users/create", json={
+        "username": "loginuser",
+        "email": "login@test.com",
+        "password": "Testpassword1!"
+    })
+
+    client.post("/api/users/login", json={
+        "email": "login@test.com",
+        "password": "Testpassword1!"
+    })
+
+    res = client.get("/api/users/me")
+    assert res.status_code == 200
