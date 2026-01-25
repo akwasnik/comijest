@@ -57,6 +57,18 @@ class UserController:
         if not can_access_user(user_id):
             return {"msg": "forbidden"}, 403
         return jsonify(user.to_public_dict()), 200
+    
+    
+    @staticmethod
+    @jwt_required()
+    def get_me():
+        user_id = get_jwt_identity()
+        user = UserService.get_user_by_id(user_id)
+
+        if not user:
+            return {"msg": "User not found"}, 404
+
+        return user.to_public_dict(), 200
 
     @staticmethod
     def update(user_id):

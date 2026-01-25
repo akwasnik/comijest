@@ -1,0 +1,29 @@
+# --- PYTHON ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# --- IDE (Ustawienia edytora) ---
+.idea/
+.vscode/
+
+# --- DANE (Data) ---
+# Ignorujemy przetworzone, bo skrypt je wygeneruje
+data/processed/
+
+# --- MODELE (Models) ---
+/models/
+!/models/.gitkeep
+
+# --- RAPORTY ---
+/reports/
+
+# --- LOGI I PLIKI TYMCZASOWE ---
+logs/
+results/
+results_*/
+temp_*/
+
+# skrypty (trzymamy w repo)
