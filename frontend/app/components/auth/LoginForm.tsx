@@ -34,7 +34,7 @@ export default function LoginForm() {
       return response;
     },
     onSuccess: () => {
-      router.push("/profile");
+      router.push("/profile")
     },
   });
 
@@ -58,8 +58,32 @@ export default function LoginForm() {
             .email("Niepoprawny email")
             .required("Wymagane"),
           password: Yup.string()
-            .min(6, "Minimum 6 znaków")
-            .required("Wymagane"),
+                      .min(12, "Hasło musi mieć min. 12 znaków")
+                      .test(
+                        "has-uppercase",
+                        "Hasło musi zawierać wielką literę",
+                        (value) => !!value && [...value].some((c) => c >= "A" && c <= "Z")
+                      )
+                      .test(
+                        "has-lowercase",
+                        "Hasło musi zawierać małą literę",
+                        (value) => !!value && [...value].some((c) => c >= "a" && c <= "z")
+                      )
+                      .test(
+                        "has-digit",
+                        "Hasło musi zawierać cyfrę",
+                        (value) => !!value && [...value].some((c) => c >= "0" && c <= "9")
+                      )
+                      .test(
+                        "has-special",
+                        "Hasło musi zawierać znak specjalny",
+                        (value) =>
+                          !!value &&
+                          [...value].some(
+                            (c) => !/[a-zA-Z0-9]/.test(c)
+                          )
+                      )
+                      .required("Wymagane"),
         })}
         onSubmit={(values, { setSubmitting }) => {
           loginMutation.mutate(values, {

@@ -1,12 +1,20 @@
 "use client";
 
+import EditProfileModal from "@/app/components/misc/EditProfileModal";
 import { useUser } from "@/app/context/UserContext";
 import { motion } from "framer-motion";
+import { useLayoutEffect, useState } from "react";
 
 function ProfileContent() {
 
-  const { user, isLoading } = useUser();
+  const { user, isLoading, refetchUser } = useUser();
 
+  const [open, setOpen] = useState(false);
+
+
+  useLayoutEffect(() => {
+    refetchUser()
+  },[])
 
   if (isLoading) {
     return (
@@ -24,7 +32,7 @@ function ProfileContent() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="
-        mx-auto mt-24 max-w-xl
+        mx-auto mt-24 max-w-xl mb-24
         rounded-2xl border
         bg-background/80
         p-8 shadow-xl backdrop-blur
@@ -40,19 +48,22 @@ function ProfileContent() {
         <ProfileRow label="Hasło" value="••••••••••" />
       </div>)}
 
-      <div className="mt-8 flex flex-col gap-3">
-        <button
-          disabled
-          className="
-            w-full rounded-xl border
-            bg-muted px-4 py-2
-            text-muted-foreground
-            cursor-not-allowed
-          "
-        >
-          Edytuj dane (wkrótce)
-        </button>
-      </div>
+      <button
+        onClick={() => setOpen(true)}
+        className="
+          w-full rounded-xl border
+          px-4 py-2 font-semibold
+          hover:bg-muted transition
+        "
+      >
+        Edytuj dane
+      </button>
+
+      <EditProfileModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+      />
+
     </motion.section>
   );
 }

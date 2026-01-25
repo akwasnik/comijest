@@ -34,7 +34,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     queryKey: ["currentUser"],
     queryFn: async () => {
       const res = await fetch(
-        "http://localhost:5000/api/users/get_one",
+        "http://localhost:5000/api/users/me",
         {
           credentials: "include",
         }

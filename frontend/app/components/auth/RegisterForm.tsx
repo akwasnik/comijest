@@ -4,7 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 interface RegisterPayload {
   username: string;
@@ -13,6 +13,7 @@ interface RegisterPayload {
 }
 
 export default function RegisterForm() {
+  const router = useRouter()
   const registerMutation = useMutation({
     mutationFn: async (payload: RegisterPayload) => {
       const res = await fetch("http://localhost:5000/api/users/create", {
@@ -30,6 +31,7 @@ export default function RegisterForm() {
 
       return res.json();
     },
+    onSuccess: () => router.push("/login")
   });
 
   return (
@@ -99,10 +101,7 @@ export default function RegisterForm() {
               password: values.password,
             },
             {
-              onSettled: () => {
-                setSubmitting(false);
-                if(registerMutation.isSuccess) redirect("/login");
-              },
+              onSettled: () => setSubmitting(false),
             }
           );
           
