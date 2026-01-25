@@ -4,7 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 interface LoginPayload {
   email: string;
@@ -12,6 +12,7 @@ interface LoginPayload {
 }
 
 export default function LoginForm() {
+  const router = useRouter();
   
   const loginMutation = useMutation({
     mutationFn: async (payload: LoginPayload) => {
@@ -31,6 +32,9 @@ export default function LoginForm() {
       const response = await res.json()
       console.log(response);
       return response;
+    },
+    onSuccess: () => {
+      router.push("/profile");
     },
   });
 

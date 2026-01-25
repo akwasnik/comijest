@@ -5,6 +5,9 @@ import Footer from "./components/Footer";
 import SmoothScrollProvider from "./providers/SmoothScrollProvider";
 import CustomThemeProvider from "./providers/ThemeProvider";
 import GlobalLoader from "./components/GlobalLoader";
+import QueryProvider from "./providers/QueryProvider";
+import { UserProvider } from "@/app/context/UserContext";
+
 
 export const metadata: Metadata = {
   title: "Comijest",
@@ -18,9 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GlobalLoader/>
 
         <CustomThemeProvider>
-          <Header />
-          <SmoothScrollProvider><div id="page-fade-in">{children}</div></SmoothScrollProvider>
-          <Footer />
+          <QueryProvider>
+            <UserProvider>
+              <Header />
+              <SmoothScrollProvider><div id="page-fade-in">{children}</div></SmoothScrollProvider>
+              <Footer />
+            </UserProvider>
+          </QueryProvider>
         </CustomThemeProvider>
       </body>
     </html>
