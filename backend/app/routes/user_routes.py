@@ -26,12 +26,12 @@ user_bp.get(
     jwt_required()(UserController.get_one))
 )
 
-user_bp.get(
+user_bp.put(
     "/me",
-    endpoint="get_me"
+    endpoint="update_me"
 )(
-    permission_required_any(["user:read_self"])(
-        jwt_required()(UserController.get_me)
+    permission_required_any(["user:update_self"])(
+        jwt_required()(UserController.update_me)
     )
 )
 
