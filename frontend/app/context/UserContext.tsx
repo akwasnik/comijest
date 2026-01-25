@@ -34,7 +34,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     queryKey: ["currentUser"],
     queryFn: async () => {
       const res = await fetch(
-        "http://backend:5000/api/users/me",
+        "https://backend:5000/api/users/me",
         {
           credentials: "include",
         }
@@ -56,7 +56,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(
-        "http://backend:5000/api/users/logout",
+        "https://backend:5000/api/users/logout",
         {
           method: "POST",
           credentials: "include",

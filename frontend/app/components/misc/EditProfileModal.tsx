@@ -101,7 +101,7 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
   const updateMutation = useMutation({
     mutationFn: async (values: UpdateUserPayload) => {
       const res = await fetch(
-        "http://backend:5000/api/users/me",
+        "https://backend:5000/api/users/me",
         {
           method: "PUT",
           credentials: "include",

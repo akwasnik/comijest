@@ -119,7 +119,7 @@ export default function DiagnosePage() {
   
   const mutation = useMutation<DiagnoseApiResponse, Error, DiagnosePayload>({
     mutationFn: async (payload) => {
-      const res = await fetch("http://backend:5000/api/diagnose/diagnose", {
+      const res = await fetch("https://backend:5000/api/diagnose/diagnose", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
