@@ -14,16 +14,16 @@ venv/
 data/processed/
 
 # --- MODELE (Models) ---
-# To jest najważniejsze! Modele są za ciężkie na GitHuba.
-/models/*
-!ML/models/.gitkeep
+/models/
+!/models/.gitkeep
 
 # --- RAPORTY ---
-# Wykresy warto trzymać, ale pliki pośrednie .pkl są zbędne
-ML/reports/*.pkl
+/reports/
 
 # --- LOGI I PLIKI TYMCZASOWE ---
 logs/
 results/
 results_*/
 temp_*/
+
+# skrypty (trzymamy w repo)
