@@ -11,13 +11,13 @@ from .extensions import limiter, jwt
 def create_app(testing=False):
     app = Flask(__name__)
     cors = CORS(
-    app,
-    resources={r"/api/*": {
-        "origins": ["*"],
-        "allow_headers": ["Authorization", "Content-Type"],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    }},
-    supports_credentials=True
+        app,
+        resources={r"/api/*": {
+            "origins": ["*"],
+            "allow_headers": ["Authorization", "Content-Type"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        }},
+        supports_credentials=True
     )
     app.url_map.strict_slashes = False
 

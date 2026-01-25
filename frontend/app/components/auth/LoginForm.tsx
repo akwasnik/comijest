@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 
 interface LoginPayload {
   email: string;
@@ -27,10 +28,9 @@ export default function LoginForm() {
         const error = await res.json();
         throw new Error(error?.message || "Błąd logowania");
       }
-
-      const resss = await res.json()
-      console.log(resss);
-      return res.json();
+      const response = await res.json()
+      console.log(response);
+      return response;
     },
   });
 
@@ -59,7 +59,10 @@ export default function LoginForm() {
         })}
         onSubmit={(values, { setSubmitting }) => {
           loginMutation.mutate(values, {
-            onSettled: () => setSubmitting(false),
+            onSettled: () => {
+              setSubmitting(false);
+              if(loginMutation.isSuccess) redirect("/")
+            },
           });
         }}
       >

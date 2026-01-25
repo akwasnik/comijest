@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 
 interface RegisterPayload {
   username: string;
@@ -23,7 +24,8 @@ export default function RegisterForm() {
       });
 
       if (!res.ok) {
-        throw new Error("Błąd rejestracji");
+        const errormsg = await res.json()
+        throw new Error(errormsg.message);
       }
 
       return res.json();
@@ -97,9 +99,13 @@ export default function RegisterForm() {
               password: values.password,
             },
             {
-              onSettled: () => setSubmitting(false),
+              onSettled: () => {
+                setSubmitting(false);
+                if(registerMutation.isSuccess) redirect("/login");
+              },
             }
           );
+          
         }}
       >
         {({ isSubmitting }) => (
@@ -158,6 +164,12 @@ export default function RegisterForm() {
             >
               {registerMutation.isPending ? "Rejestruję..." : "Zarejestruj"}
             </motion.button>
+             {registerMutation.isError && (
+              <p className="text-sm text-red-600 text-center">
+                {(registerMutation.error).message}
+              </p>
+             )}
+             
           </Form>
         )}
       </Formik>
