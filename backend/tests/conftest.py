@@ -1,33 +1,17 @@
 import pytest
 import mongomock
-from flask_jwt_extended import create_access_token, create_refresh_token
 from app import create_app
-
-ROLE_PERMISSIONS = {
-    "admin": {
-        "user:read",
-        "user:update"
-        "user:delete",
-        "user:list",
-    },
-    "user": {
-        "user:read_self",
-        "user:update_self",
-    },
-}
+from werkzeug.security import generate_password_hash
 
 
 @pytest.fixture
 def app():
     app = create_app(testing=True)
-
     app.mongo = mongomock.MongoClient().db_for_tests
 
     ctx = app.app_context()
     ctx.push()
-
     yield app
-
     ctx.pop()
 
 
@@ -36,90 +20,41 @@ def client(app):
     return app.test_client()
 
 
-@pytest.fixture
-def admin_headers(app):
-    token = create_access_token(
-        identity="admin-id",
-        additional_claims={
-            "role": "admin",
-            "permissions": list(ROLE_PERMISSIONS["admin"]),
-        },
-    )
-    return {"Authorization": f"Bearer {token}"}
-
+# ---------- USER CLIENT (cookies) ----------
 
 @pytest.fixture
-def user_headers(app):
-    token = create_access_token(
-        identity="user-id",
-        additional_claims={
-            "role": "user",
-            "permissions": list(ROLE_PERMISSIONS["user"]),
-        },
-    )
-    return {"Authorization": f"Bearer {token}"}
-
-
-@pytest.fixture
-def created_user(client):
-    res = client.post(
-        "/api/users/create",
-        json={
-            "username": "testuser",
-            "email": "test@test.com",
-            "password": "Testpassword1!",
-        },
-    )
-    return res.get_json()["id"]
-
-@pytest.fixture
-def user_with_token(client):
-    res = client.post("/api/users/create", json={
+def user_client(client):
+    client.post("/api/users/create", json={
         "username": "normaluser",
         "email": "user@test.com",
         "password": "Testpassword1!"
     })
-    user_id = res.get_json()["id"]
 
-    token = create_access_token(
-        identity=user_id,
-        additional_claims={
-            "role": "user",
-            "permissions": ["user:read_self", "user:update_self"]
-        }
-    )
-
-    headers = {"Authorization": f"Bearer {token}"}
-    return user_id, headers
-
-@pytest.fixture
-def user_tokens(client):
-    res = client.post("/api/users/create", json={
-        "username": "refreshuser",
-        "email": "refresh@test.com",
+    res = client.post("/api/users/login", json={
+        "email": "user@test.com",
         "password": "Testpassword1!"
     })
-    user_id = res.get_json()["id"]
 
-    access_token = create_access_token(
-        identity=user_id,
-        additional_claims={
-            "role": "user",
-            "permissions": ["user:read_self", "user:update_self"]
-        }
-    )
+    assert res.status_code == 200
+    return client
 
-    refresh_token = create_refresh_token(
-        identity=user_id,
-        additional_claims={
-            "role": "user"
-        }
-    )
 
-    return {
-        "user_id": user_id,
-        "access": access_token,
-        "refresh": refresh_token,
-        "access_headers": {"Authorization": f"Bearer {access_token}"},
-        "refresh_headers": {"Authorization": f"Bearer {refresh_token}"}
-    }
+# ---------- ADMIN CLIENT (cookies) ----------
+
+@pytest.fixture
+def admin_client(client):
+    # insert admin directly
+    client.application.mongo.users.insert_one({
+        "username": "admin",
+        "email": "admin@test.com",
+        "password": generate_password_hash("Adminpassword1!"),
+        "role": "admin"
+    })
+
+    res = client.post("/api/users/login", json={
+        "email": "admin@test.com",
+        "password": "Adminpassword1!"
+    })
+
+    assert res.status_code == 200
+    return client
