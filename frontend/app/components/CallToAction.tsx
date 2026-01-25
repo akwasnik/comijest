@@ -47,7 +47,7 @@ export default function CallToAction() {
             className="relative"
           >
             <Link
-              href="/symptoms"
+              href="/diagnose"
               className="inline-flex items-center justify-center px-8 py-3 rounded-full bg-red-600 text-white font-medium text-base md:text-lg shadow-lg hover:bg-red-700 transition hover:shadow-[0_0_25px_rgba(248,113,113,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-red-50"
             >
               Rozpocznij diagnozę
