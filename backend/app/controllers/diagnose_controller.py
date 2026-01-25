@@ -3,6 +3,6 @@ from ..services.diagnose_service import DiagnoseService
 
 
 class DiagnoseController:
-    def diagnose(data):
+    def diagnose():
         illnes = DiagnoseService.diagnose()
-        return jsonify({ "message": f'You have ${illnes}'})
+        return jsonify({ "message": f'You have {illnes}'})

@@ -1,5 +1,5 @@
 class DiagnoseService:
 
     @staticmethod
-    def diagnose(data):
+    def diagnose():
         return "Ligma"
