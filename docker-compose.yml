@@ -12,12 +12,20 @@ services:
       - MONGO_DB_CONNECTION_STRING=mongodb://mongo:27017/comijest
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
+      - ADMIN_EMAIL=admin@comijest.pl
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=SuperBezpieczneHaslo!123
     restart: unless-stopped
     depends_on:
       - mongo
       - redis
     networks:
       - comijest_net
+    command: >
+      sh -c "
+      python scripts/create_admin.py &&
+      gunicorn app:app --bind 0.0.0.0:5000
+      "
   frontend:
     build:
       context: ./frontend
