@@ -16,7 +16,7 @@ export default function RegisterForm() {
   const router = useRouter()
   const registerMutation = useMutation({
     mutationFn: async (payload: RegisterPayload) => {
-      const res = await fetch("https://backend:5000/api/users/create", {
+      const res = await fetch("/api/users/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

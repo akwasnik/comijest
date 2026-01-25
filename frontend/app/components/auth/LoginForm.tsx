@@ -16,7 +16,7 @@ export default function LoginForm() {
   
   const loginMutation = useMutation({
     mutationFn: async (payload: LoginPayload) => {
-      const res = await fetch("https://backend:5000/api/users/login", {
+      const res = await fetch("/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

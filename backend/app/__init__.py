@@ -45,7 +45,7 @@ def create_app(testing=False):
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
     # app.config["JWT_COOKIE_SAMESITE"] = "Lax"
-    app.config["JWT_COOKIE_SECURE"] = False 
+    # app.config["JWT_COOKIE_SECURE"] = False 
     jwt.init_app(app)
 
     client = MongoClient(MONGO_URI)
