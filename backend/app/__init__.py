@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from .config import JWT_SECRET, MONGO_URI
 from .routes.user_routes import user_bp
+from .routes.diagnose_routes import diagnose_bp
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pymongo import MongoClient
 from .extensions import limiter, jwt
@@ -54,6 +55,7 @@ def create_app(testing=False):
     limiter.init_app(app)
     
     app.register_blueprint(user_bp, url_prefix="/api/users")
+    app.register_blueprint(diagnose_bp, url_prefix="/api/diagnose")
 
     return app
 
