@@ -1,6 +1,12 @@
-from flask_jwt_extended import get_jwt, get_jwt_identity
+from functools import wraps
 from flask import jsonify
+from flask_jwt_extended import (
+    verify_jwt_in_request,
+    get_jwt,
+    get_jwt_identity,
+)
 from .persmission import ROLE_PERMISSIONS
+
 
 def has_permission(permission):
     claims = get_jwt()
@@ -17,7 +23,10 @@ def has_any_permission(permissions):
 
 def permission_required_any(permissions):
     def wrapper(fn):
+        @wraps(fn)
         def inner(*args, **kwargs):
+            verify_jwt_in_request()
+
             if not has_any_permission(permissions):
                 return jsonify({"msg": "forbidden"}), 403
             return fn(*args, **kwargs)
@@ -25,17 +34,22 @@ def permission_required_any(permissions):
     return wrapper
 
 
-def permission_required(permissions):
+def permission_required(permission):
     def wrapper(fn):
+        @wraps(fn)
         def inner(*args, **kwargs):
-            if not has_permission(permissions):
+            verify_jwt_in_request()
+
+            if not has_permission(permission):
                 return jsonify({"msg": "forbidden"}), 403
             return fn(*args, **kwargs)
         return inner
     return wrapper
 
 
-def can_acces_user(target_user_id):
+def can_access_user(target_user_id):
+    verify_jwt_in_request()
+
     claims = get_jwt()
     role = claims.get("role")
     identity = get_jwt_identity()

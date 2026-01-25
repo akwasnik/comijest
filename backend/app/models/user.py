@@ -29,7 +29,15 @@ class User:
             "email": self.email,
             "password": self.password
         }
-
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "role": self.role,
+            "password": self.password
+        }
     @staticmethod
     def from_mongo(data):
         if not data:

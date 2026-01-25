@@ -1,3 +1,4 @@
+from flask_jwt_extended import create_access_token
 import pytest
 from app.services.user_services import UserService
 from werkzeug.security import check_password_hash
@@ -5,6 +6,11 @@ from werkzeug.security import check_password_hash
 from app.exceptions.user_exceptions import (
     UsernameTakenError, EmailTakenError, SamePasswordError
 )
+
+def test_jwt_works(app):
+    token = create_access_token(identity="test")
+    assert token is not None
+    
 def test_create_user(app):
     user = UserService.create_user("adam", "adam@test.com", "pass123")
     assert user is not None

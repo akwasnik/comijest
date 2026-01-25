@@ -5,11 +5,10 @@ from .config import JWT_SECRET, MONGO_URI
 from .routes.user_routes import user_bp
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pymongo import MongoClient
-from flask_jwt_extended import JWTManager
-from .extensions import limiter
+from .extensions import limiter, jwt
 
 
-def create_app():
+def create_app(testing=False):
     app = Flask(__name__)
     cors = CORS(
     app,
@@ -28,13 +27,13 @@ def create_app():
         x_proto=1,
         x_host=1
     )
-
+    #configuration for jwt and cookies
     if testing:
         app.config["JWT_SECRET_KEY"] = "test_secret"
     else:
-        app.config["RATELIMIT_STORAGE_URI"] = "redis://redis:6379"
         app.config["JWT_SECRET_KEY"] = JWT_SECRET
-    #configuration for jwt and cookies
+        app.config["RATELIMIT_STORAGE_URI"] = "redis://redis:6379" #PROD
+    
     app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
     app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token"
     app.config["JWT_HEADER_NAME"] = "Authorization"
@@ -44,17 +43,11 @@ def create_app():
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
-    jwt = JWTManager(app)
+    jwt.init_app(app)
 
     client = MongoClient(MONGO_URI)
 
     app.mongo = client["comijest"]
-    
-
-    try:
-        print("Connected to DB")
-    except Exception as e:
-        print("Connection failed:", e)
     
     limiter.init_app(app)
     
