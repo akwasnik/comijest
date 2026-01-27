@@ -141,7 +141,7 @@ def save_logs_and_curves(log_history, report_dir):
 def build_training_args(model_name):
     kwargs = {
         "output_dir": f"../models/temp/{model_name}",
-        "num_train_epochs": 6,
+        "num_train_epochs": 3,
         "per_device_train_batch_size": 8,
         "learning_rate": 2e-5,
         "fp16": torch.cuda.is_available(),
@@ -150,11 +150,11 @@ def build_training_args(model_name):
         "dataloader_num_workers": 2,
         "dataloader_pin_memory": True,
         "evaluation_strategy": "steps",
-        "eval_steps": 3000,
+        "eval_steps": 6000,
         "logging_strategy": "steps",
         "logging_steps": 50,
         "save_strategy": "steps",
-        "save_steps": 3000,
+        "save_steps": 6000,
         "save_total_limit": 1,
         "load_best_model_at_end": True,
         "metric_for_best_model": "eval_loss",

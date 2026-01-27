@@ -4,8 +4,8 @@ import os
 
 import pandas as pd
 
-DEFAULT_INPUT_TRAIN = "../data/non_sentence/train.csv"
-DEFAULT_INPUT_TEST = "../data/non_sentence/test.csv"
+DEFAULT_INPUT_TRAIN = "../data/raw/train.csv"
+DEFAULT_INPUT_TEST = "../data/raw/test.csv"
 DEFAULT_OUTPUT_DIR = "../data/sentence"
 
 TIMEFRAMES = [
