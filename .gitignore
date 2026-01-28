@@ -210,3 +210,5 @@ docs/*.png
 .AppleDouble
 .Spotlight-V100
 .fseventsd
+
+onedrive/
