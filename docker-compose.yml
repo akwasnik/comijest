@@ -16,6 +16,10 @@ services:
       - ADMIN_EMAIL=admin@comijest.pl
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=SuperBezpieczneHaslo!123
+      - MODEL_DIR=/home/debian/comijest/backend/onedrive
+      - MODEL_MAX_LENGTH=128
+      - TRANSLATION_PROVIDER=libre
+      - LIBRE_TRANSLATE_URL=http://libretranslate:5000/translate
     restart: unless-stopped
     depends_on:
       - mongo
@@ -78,6 +82,15 @@ services:
       - "6379:6379"
     expose:
       - "6379"
+    networks:
+      - comijest_net
+
+  libretranslate:
+    image: libretranslate/libretranslate
+    container_name: comijest_libretranslate
+    restart: unless-stopped
+    expose:
+      - "5000"
     networks:
       - comijest_net
 
