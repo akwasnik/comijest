@@ -16,7 +16,7 @@ services:
       - ADMIN_EMAIL=admin@comijest.pl
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=SuperBezpieczneHaslo!123
-      - MODEL_DIR="../../onedrive"
+      - MODEL_DIR=/models/BioClinicalBERT
       - MODEL_MAX_LENGTH=128
       - TRANSLATION_PROVIDER=libre
       - LIBRE_TRANSLATE_URL=http://libretranslate:5000/translate
@@ -26,6 +26,8 @@ services:
       - redis
     networks:
       - comijest_net
+    volumes:
+      - /home/debian/comijest/backend/onedrive:/models/BioClinicalBERT:ro
     command: >
       sh -c "
       python app/scripts/create_admin.py &&
