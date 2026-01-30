@@ -39,9 +39,10 @@ type DiagnosePayload = {
 };
 
 type DiagnoseApiResponse = {
-  message: string;
-  confidence?: number;
-  followup?: string[];
+  top5: {
+    label_pl: string;
+    prob: number;
+  }[];
 };
 
 
@@ -125,15 +126,26 @@ export default function DiagnosePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-  
-      const data = await res.json();
-  
-      if (!res.ok) {
-        throw new Error(
-          data?.error || data?.msg || "Nie udało się wykonać diagnozy"
-        );
+
+      let data: unknown = null;
+
+      try {
+        data = await res.json();
+      } catch {
+        // response body empty or invalid JSON
       }
-  
+
+      if (!res.ok) {
+        const errorMessage =
+          typeof data === "object" && data !== null && "error" in data
+            ? (data as { error?: string }).error
+            : typeof data === "object" && data !== null && "msg" in data
+            ? (data as { msg?: string }).msg
+            : "Nie udało się wykonać diagnozy";
+
+        throw new Error(errorMessage);
+      }
+
       return data as DiagnoseApiResponse;
     },
     onSuccess: (data) => {
@@ -314,88 +326,74 @@ export default function DiagnosePage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
+            transition={{ duration: 0.6 }}
             className="
-              mt-12 relative w-full
-              overflow-hidden rounded-[2rem]
-              border bg-background/80
-              p-8 shadow-2xl backdrop-blur
+              mt-14 rounded-[2.5rem] border
+              bg-background/80 p-8 shadow-2xl backdrop-blur
             "
           >
-            {/* glow */}
-            <div className="pointer-events-none absolute inset-0 opacity-40">
-              <div className="h-full w-full bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.35),transparent_65%)]" />
+            <h2 className="text-2xl font-bold tracking-tight">
+              Najbardziej prawdopodobne diagnozy
+            </h2>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              Wyniki uszeregowane według prawdopodobieństwa
+            </p>
+
+            <div className="mt-8 space-y-4">
+              {result.top5
+                .sort((a, b) => b.prob - a.prob)
+                .map((d, idx) => {
+                  const percent = Math.round(d.prob * 100);
+
+                  return (
+                    <motion.div
+                      key={d.label_pl}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.08 }}
+                      className={[
+                        "rounded-2xl border p-5 shadow-sm",
+                        "bg-background/70",
+                        idx === 0
+                          ? "border-red-500/60 ring-2 ring-red-500/30"
+                          : "",
+                      ].join(" ")}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            #{idx + 1}
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {d.label_pl}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-red-500">
+                            {percent}%
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* progress bar */}
+                      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percent}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          className="h-full bg-red-500"
+                        />
+                      </div>
+                    </motion.div>
+                  );
+                })}
             </div>
 
-            <div className="relative flex flex-col gap-6 md:flex-row md:items-start">
-              {/* Avatar */}
-              <motion.div
-                initial={{ scale: 0.85, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.15 }}
-                className="
-                  flex h-24 w-24 shrink-0 items-center justify-center
-                  rounded-3xl border
-                  bg-background/60 shadow-lg
-                "
-              >
-                <motion.div
-                  animate={{ scale: [1, 1.08, 1] }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 3.5,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <Stethoscope className="h-12 w-12 text-red-500" />
-                </motion.div>
-              </motion.div>
-
-              {/* Content */}
-              <div className="flex-1">
-                <motion.h2
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.25 }}
-                  className="text-2xl font-bold tracking-tight"
-                >
-                  Odpowiedź Doktora AI
-                </motion.h2>
-
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.35 }}
-                  className="mt-2 text-sm text-muted-foreground"
-                >
-                  Na podstawie wybranych objawów oraz opisu.
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.45 }}
-                  className="
-                    mt-6 rounded-3xl border
-                    bg-background/70 p-6
-                    text-base leading-relaxed
-                    shadow-sm
-                  "
-                >
-                  {result.message ??
-                    "Doktor AI nie zwrócił jeszcze jednoznacznej odpowiedzi."}
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="mt-5 text-xs text-muted-foreground"
-                >
-                  ⚠️ Informacja poglądowa — nie zastępuje porady lekarza.
-                </motion.div>
-              </div>
-            </div>
+            <p className="mt-6 text-xs text-muted-foreground">
+              ⚠️ Wynik ma charakter informacyjny i nie zastępuje konsultacji lekarskiej.
+            </p>
           </motion.section>
         )}
       </AnimatePresence>
@@ -477,24 +475,65 @@ export default function DiagnosePage() {
                 Wyczyść
               </button>
             </div>
-
-            <AnimatePresence>
-              {mutation.isError && (
-                <motion.p
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  className="mt-3 rounded-2xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-600"
-                >
-                  {(mutation.error as Error).message}
-                </motion.p>
-              )}
-            </AnimatePresence>
           </div>
         </div>
       </motion.section>
+      <AnimatePresence>
+            {mutation.isPending && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="
+                    fixed inset-0 z-50 flex items-center justify-center
+                    bg-background/80 backdrop-blur-xl
+                  "
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="
+                      flex flex-col items-center gap-6
+                      rounded-3xl border bg-background/70
+                      px-10 py-12 shadow-2xl
+                    "
+                  >
+                    
+                    <motion.div
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.8 }}
+                      className="
+                        flex h-20 w-20 items-center justify-center
+                        rounded-3xl border bg-background
+                      "
+                    >
+                      <Stethoscope className="h-10 w-10 text-red-500" />
+                    </motion.div>
 
+                    <h3 className="text-xl font-bold tracking-tight">
+                      Analizuję objawy…
+                    </h3>
 
+                    <p className="max-w-xs text-center text-sm text-muted-foreground">
+                      Łączę symptomy z bazą chorób i modelami predykcyjnymi
+                    </p>
+
+                    <div className="w-64 overflow-hidden rounded-full border">
+                      <motion.div
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "100%" }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1.2,
+                          ease: "linear",
+                        }}
+                        className="h-2 bg-red-500/70"
+                      />
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+      </AnimatePresence>
     </main>
   );
 }
