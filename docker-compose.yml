@@ -16,7 +16,7 @@ services:
       - ADMIN_EMAIL=admin@comijest.pl
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=SuperBezpieczneHaslo!123
-      - MODEL_DIR=/home/debian/comijest/backend/onedrive
+      - MODEL_DIR="../../onedrive"
       - MODEL_MAX_LENGTH=128
       - TRANSLATION_PROVIDER=libre
       - LIBRE_TRANSLATE_URL=http://libretranslate:5000/translate

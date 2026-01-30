@@ -9,7 +9,6 @@ class DiagnoseController:
         symptoms = payload.get("symptoms", [])
         userinput = (payload.get("userinput") or "").strip()
 
-        # łączenie w jeden ciąg (PL)
         parts = []
         if userinput:
             parts.append(userinput)
