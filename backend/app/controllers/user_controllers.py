@@ -28,22 +28,15 @@ class UserController:
 
 
     def login():
-        try:
-            data = UserLoginSchema().load(request.get_json())
+        data = UserLoginSchema().load(request.get_json())
+        access, refresh = UserService.login_user(
+            data["email"], data["password"]
+        )
+        response = jsonify({"msg": "logged in"})
+        set_access_cookies(response, access)
+        set_refresh_cookies(response, refresh)
+        return response, 200
 
-            access, refresh = UserService.login_user(
-                data["email"], data["password"]
-            )
-
-            response = jsonify({"msg": "logged in"})
-
-            set_access_cookies(response, access)
-            set_refresh_cookies(response, refresh)
-
-            return response, 200
-        except InvalidPasswordOrEmail:
-            return jsonify({"error": "Invalid email or password"}), 401
-    
     @staticmethod
     def get_all():
         users = UserService.get_users()
@@ -52,41 +45,23 @@ class UserController:
     @staticmethod
     def get_one(user_id):
         user = UserService.get_user_by_id(user_id)
-        if not user:
-            return jsonify({"message": "User not found"}), 404
         if not can_access_user(user_id):
             return {"msg": "forbidden"}, 403
         return jsonify(user.to_public_dict()), 200
-    
-    
-    @staticmethod
-    @jwt_required()
-    def get_me():
-        user_id = get_jwt_identity()
-        user = UserService.get_user_by_id(user_id)
-
-        if not user:
-            return {"msg": "User not found"}, 404
-
-        return user.to_public_dict(), 200
 
     @staticmethod
     def update(user_id):
+
         if not can_access_user(user_id):
             return jsonify({"msg": "forbidden"}), 403
-        try:
-            data = UpdateUserSchema().load(request.get_json())
-            data = request.json
-            updated = UserService.update_user(user_id, data)
-            return jsonify({"message": updated}), 200
-        except ValidationError as err:
-            return jsonify({"errors": err.messages}), 400
-        except UsernameTakenError as err:
-            return jsonify({"error": "Username already taken"}), 409
-        except EmailTakenError as err:
-            return jsonify({"error": "Email already taken"}), 409
-        except SamePasswordError as err:
-            return jsonify({"error": "New password cannot be the same as the old one"}), 400
+
+        data = UpdateUserSchema().load(request.get_json())
+
+        updated = UserService.update_user(user_id, data)
+
+        return jsonify({
+            "message": updated
+        }), 200
 
     @staticmethod
     def delete(user_id):
