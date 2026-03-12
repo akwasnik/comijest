@@ -19,8 +19,8 @@ def test_create_user(app):
 
 def test_create_user_duplicate(app):
     UserService.create_user("adam", "adam@test.com", "pass123")
-    duplicate = UserService.create_user("adam", "adam@test.com", "pass123")
-    assert duplicate is None
+    with pytest.raises(EmailTakenError):
+        UserService.create_user("adam2", "adam@test.com", "pass123")
 
 
 def test_update_username_service(app):

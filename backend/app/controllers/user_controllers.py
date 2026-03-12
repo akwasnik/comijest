@@ -19,8 +19,6 @@ class UserController:
                 data["email"],
                 data["password"]
             )
-            if not user:
-                return jsonify({"message": "User already exists"}), 409
         except ValidationError as err:
             return jsonify({"errors": err.messages}), 400
 

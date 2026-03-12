@@ -9,9 +9,9 @@ class UserService:
     @staticmethod
     def create_user(username, email, password):
         if UserRepository.find_by_email(email):
-            return None
+            raise EmailTakenError()
         if UserRepository.find_by_username(username):
-            return None
+            raise UsernameTakenError()
         hashed = generate_password_hash(password)
         user = User(username, email, hashed)
 
@@ -50,7 +50,10 @@ class UserService:
 
     @staticmethod
     def delete_user(user_id):
-        return UserRepository.delete(user_id)
+        res = UserRepository.delete(user_id)
+        if res.deleted_count == 0:
+            raise UserNotFound()
+        return True
     
     @staticmethod
     def login_user(email, password):
