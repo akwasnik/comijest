@@ -4,7 +4,6 @@ from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, j
 from ..security.authorization import can_access_user
 from ..schemes.user_scheme import UserLoginSchema, UserSchema, UpdateUserSchema
 from ..services.user_services import UserService
-from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
 from marshmallow import ValidationError
 
 class UserController:
@@ -26,14 +25,17 @@ class UserController:
 
 
     def login():
-        data = UserLoginSchema().load(request.get_json())
-        access, refresh = UserService.login_user(
-            data["email"], data["password"]
-        )
-        response = jsonify({"msg": "logged in"})
-        set_access_cookies(response, access)
-        set_refresh_cookies(response, refresh)
-        return response, 200
+        try:
+            data = UserLoginSchema().load(request.get_json())
+            access, refresh = UserService.login_user(
+                data["email"], data["password"]
+            )
+            response = jsonify({"msg": "logged in"})
+            set_access_cookies(response, access)
+            set_refresh_cookies(response, refresh)
+            return response, 200
+        except ValidationError as err:
+            return jsonify({"errors": err.messages}), 400
 
     @staticmethod
     def get_all():
@@ -102,8 +104,4 @@ class UserController:
     def get_me():
         user_id = get_jwt_identity()
         user = UserService.get_user_by_id(user_id)
-    
-        if not user:
-            return {"msg": "User not found"}, 404
-    
         return user.to_public_dict(), 200

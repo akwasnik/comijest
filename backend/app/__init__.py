@@ -1,6 +1,8 @@
 from datetime import timedelta
 from flask import Flask
 from flask_cors import CORS
+
+from .errors.handler import register_error_handlers
 from .config import JWT_SECRET, MONGO_URI
 from .routes.user_routes import user_bp
 from .routes.diagnose_routes import diagnose_bp
@@ -56,6 +58,8 @@ def create_app(testing=False):
     
     app.register_blueprint(user_bp, url_prefix="/api/users")
     app.register_blueprint(diagnose_bp, url_prefix="/api/diagnose")
+
+    register_error_handlers(app)
 
     return app
 
