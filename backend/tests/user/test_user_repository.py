@@ -30,7 +30,4 @@ def test_delete_user(app):
     user_id = UserRepository.create(user)
 
     deleted = UserRepository.delete(user_id)
-    assert deleted is True
-
-    result = UserRepository.find_by_id(user_id)
-    assert result is None
+    assert deleted.deleted_count is 1

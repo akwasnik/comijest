@@ -45,8 +45,7 @@ class UserRepository:
 
     @staticmethod
     def delete(user_id):
-        UserRepository.collection().delete_one({"_id": ObjectId(user_id)})
-        return True
+        return UserRepository.collection().delete_one({"_id": ObjectId(user_id)})
 
     @staticmethod
     def find_by_email_for_login(email):

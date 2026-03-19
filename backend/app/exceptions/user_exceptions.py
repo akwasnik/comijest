@@ -1,14 +1,30 @@
-class UsernameTakenError(Exception):
-    """Raised when trying to use a username that already exists."""
-    pass
+class APIException(Exception):
+    status_code = 400
+    message = "API error"
 
-class EmailTakenError(Exception):
-    """Raised when trying to use an email that already exists."""
-    pass
+    def __init__(self, message=None):
+        if message:
+            self.message = message
 
-class SamePasswordError(Exception):
-    """Raised when new password is identical to current password."""
-    pass
-class InvalidPasswordOrEmail(Exception):
-    """Raised when invalid password or email are provided for login"""
-    pass
+class UsernameTakenError(APIException):
+    status_code = 409
+    message = "Username already exists"
+
+
+class EmailTakenError(APIException):
+    status_code = 409
+    message = "Email already exists"
+
+
+class SamePasswordError(APIException):
+    status_code = 400
+    message = "New password must be different"
+
+
+class InvalidPasswordOrEmail(APIException):
+    status_code = 401
+    message = "Invalid email or password"
+
+class UserNotFound(APIException):
+    status_code = 404
+    message = "User not found"

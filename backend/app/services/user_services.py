@@ -1,6 +1,6 @@
 from flask_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
-from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UsernameTakenError
+from ..exceptions.user_exceptions import EmailTakenError, InvalidPasswordOrEmail, SamePasswordError, UserNotFound, UsernameTakenError
 from ..models.user import User
 from ..repositories.user_repository import UserRepository
 
@@ -9,9 +9,9 @@ class UserService:
     @staticmethod
     def create_user(username, email, password):
         if UserRepository.find_by_email(email):
-            return None
+            raise EmailTakenError()
         if UserRepository.find_by_username(username):
-            return None
+            raise UsernameTakenError()
         hashed = generate_password_hash(password)
         user = User(username, email, hashed)
 
@@ -25,7 +25,10 @@ class UserService:
 
     @staticmethod
     def get_user_by_id(user_id):
-        return UserRepository.find_by_id(user_id)
+        user = UserRepository.find_by_id(user_id)
+        if user:
+            return user
+        raise UserNotFound()
 
     @staticmethod
     def update_user(user_id, data):
@@ -47,7 +50,10 @@ class UserService:
 
     @staticmethod
     def delete_user(user_id):
-        return UserRepository.delete(user_id)
+        res = UserRepository.delete(user_id)
+        if res.deleted_count == 0:
+            raise UserNotFound()
+        return True
     
     @staticmethod
     def login_user(email, password):
@@ -68,4 +74,4 @@ class UserService:
                     additional_claims=additional_claims
                 )
                 return access_token, refresh_token
-        raise InvalidPasswordOrEmail
+        raise InvalidPasswordOrEmail()
