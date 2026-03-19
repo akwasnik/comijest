@@ -35,6 +35,6 @@ wrapt==2.0.1
 redis==5.0.4
 requests==2.32.4
 transformers==4.53.2
-torch==2.6.0+cpu --index-url https://download.pytorch.org/whl/cpu
+torch==2.6.0
 joblib==1.4.2
 scikit-learn==1.5.2
